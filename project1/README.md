@@ -4,32 +4,49 @@ Follow these steps to set up the server and database for the project.
 
 ### Step 1: Create the Database
 
-Open your terminal and run the following command to create the database:
+If you do not have USER mytestuser setup in MySQL, follow the below steps to create it:
 
-```bash
+1. Login to mysql as a root user, (local>):
+
+```sql
 mysql -u root -p
 ```
 
-Enter your MySQL root password when prompted. Then, inside the MySQL shell, create the database (if it doesn't already exist) by running:
+2. Create a test user and grant privileges in SQL, (mysql>):
+
+```sql
+CREATE USER 'mytestuser'@'localhost' IDENTIFIED BY 'My6$Password';
+GRANT ALL PRIVILEGES ON * . * TO 'mytestuser'@'localhost';
+quit;
+```
+
+3. Login to USER mytestuser, (local>):
+
+```sql
+mysql -u mytestuser -p
+```
+
+4. Prepare the database moviedbexample, (mysql>):
 
 ```sql
 CREATE DATABASE IF NOT EXISTS moviedb;
+quit;
 ```
 
 ### Step 2: Create the Tables
 
-In the terminal, make sure you are in the directory containing the `createtable.sql` file. Then, run the following command to create the tables:
+In the terminal, make sure you are in the directory containing the `createtable.sql` file. Then, run the following command to create the tables, (local>):
 
 ```bash
-mysql -u root -p -D moviedb < createtable.sql
+mysql -u mytestuser -p -D moviedb < createtable.sql
 ```
 
 ### Step 3: Populate the Tables
 
-Still in the terminal and ensuring you are in the directory containing the `movie-data.sql` file, run the following command to populate the tables with data:
+Still in the terminal and ensuring you are in the directory containing the `movie-data.sql` file, run the following command to populate the tables with data, (local>):
 
 ```bash
-mysql -u root -p -D moviedb < movie-data.sql
+mysql -u mytestuser -p -D moviedb < movie-data.sql
 ```
 
 **Notes:**
