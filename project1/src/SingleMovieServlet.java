@@ -45,20 +45,20 @@ public class SingleMovieServlet extends HttpServlet {
         try (Connection conn = dataSource.getConnection()) {
             // Construct a SQL query with parameters represented by "?".
             String query = "SELECT\n" +
-                    "    m.title,\n" +
-                    "    m.year,\n" +
-                    "    m.director,\n" +
-                    "    GROUP_CONCAT(DISTINCT g.name SEPARATOR ', ') AS genres,\n" +
-                    "    GROUP_CONCAT(DISTINCT s.id SEPARATOR ', ') AS star_ids,\n" +
-                    "    GROUP_CONCAT(DISTINCT s.name SEPARATOR ', ') AS stars,\n" +
-                    "    MAX(r.rating) AS rating\n" +
-                    "FROM movies m\n" +
-                    "LEFT JOIN ratings r ON m.id = r.movieId\n" +
-                    "LEFT JOIN genres_in_movies gm ON m.id = gm.movieId\n" +
-                    "LEFT JOIN genres g ON gm.genreId = g.id\n" +
-                    "LEFT JOIN stars_in_movies sm ON m.id = sm.movieId\n" +
-                    "LEFT JOIN stars s ON sm.starId = s.id\n" +
-                    "WHERE m.id = ?";
+                            "    m.title,\n" +
+                            "    m.year,\n" +
+                            "    m.director,\n" +
+                            "    GROUP_CONCAT(DISTINCT g.name SEPARATOR ', ') AS genres,\n" +
+                            "    GROUP_CONCAT(DISTINCT s.id SEPARATOR ', ') AS star_ids,\n" +
+                            "    GROUP_CONCAT(DISTINCT s.name SEPARATOR ', ') AS stars,\n" +
+                            "    MAX(r.rating) AS rating\n" +
+                            "FROM movies m\n" +
+                            "LEFT JOIN ratings r ON m.id = r.movieId\n" +
+                            "LEFT JOIN genres_in_movies gm ON m.id = gm.movieId\n" +
+                            "LEFT JOIN genres g ON gm.genreId = g.id\n" +
+                            "LEFT JOIN stars_in_movies sm ON m.id = sm.movieId\n" +
+                            "LEFT JOIN stars s ON sm.starId = s.id\n" +
+                            "WHERE m.id = ?";
 
             // Declare a prepared statement to execute the query.
             PreparedStatement statement = conn.prepareStatement(query);

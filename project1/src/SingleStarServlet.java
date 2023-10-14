@@ -46,21 +46,17 @@ public class SingleStarServlet extends HttpServlet {
         try (Connection conn = dataSource.getConnection()) {
             // Construct a SQL query with parameters represented by "?".
             String query = "SELECT\n" +
-                    "    s.name AS StarName,\n" +
-                    "    CASE\n" +
-                    "        WHEN s.birthYear IS NOT NULL THEN s.birthYear\n" +
-                    "        ELSE 'N/A'\n" +
-                    "    END AS YearOfBirth,\n" +
-                    "    GROUP_CONCAT(DISTINCT m.title SEPARATOR ', ') AS MovieTitles,\n" +
-                    "    GROUP_CONCAT(DISTINCT m.id SEPARATOR ', ') AS MovieIds\n" +
-                    "FROM\n" +
-                    "    stars AS s\n" +
-                    "LEFT JOIN\n" +
-                    "    stars_in_movies AS sm ON s.id = sm.starId\n" +
-                    "LEFT JOIN\n" +
-                    "    movies AS m ON sm.movieId = m.id\n" +
-                    "WHERE\n" +
-                    "   s.id = ?";
+                            "    s.name AS StarName,\n" +
+                            "    CASE\n" +
+                            "        WHEN s.birthYear IS NOT NULL THEN s.birthYear\n" +
+                            "        ELSE 'N/A'\n" +
+                            "    END AS YearOfBirth,\n" +
+                            "    GROUP_CONCAT(DISTINCT m.title SEPARATOR ', ') AS MovieTitles,\n" +
+                            "    GROUP_CONCAT(DISTINCT m.id SEPARATOR ', ') AS MovieIds\n" +
+                            "FROM stars AS s\n" +
+                            "LEFT JOIN stars_in_movies AS sm ON s.id = sm.starId\n" +
+                            "LEFT JOIN movies AS m ON sm.movieId = m.id\n" +
+                            "WHERE s.id = ?";
 
             // Declare a prepared statement to execute the query.
             PreparedStatement statement = conn.prepareStatement(query);

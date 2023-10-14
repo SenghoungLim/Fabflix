@@ -36,24 +36,31 @@ public class MovieListServlet extends HttpServlet {
 
         try (Connection conn = dataSource.getConnection()) {
             // Define the SQL query to retrieve a list of movies with associated data.
-            String query = "SELECT " +
-                    "m.id, " +
-                    "m.title, " +
-                    "m.year, " +
-                    "m.director, " +
-                    "SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT g.name SEPARATOR ', '), ', ', 3) AS genres, " +
-                    "SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.id SEPARATOR ', '), ', ', 3) AS star_ids, " +
-                    "SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.name SEPARATOR ', '), ', ', 3) AS stars, " +
-                    "MAX(r.rating) AS rating " +
-                    "FROM movies m " +
-                    "LEFT JOIN ratings r ON m.id = r.movieId " +
-                    "LEFT JOIN genres_in_movies gm ON m.id = gm.movieId " +
-                    "LEFT JOIN genres g ON gm.genreId = g.id " +
-                    "LEFT JOIN stars_in_movies sm ON m.id = sm.movieId " +
-                    "LEFT JOIN stars s ON sm.starId = s.id " +
-                    "GROUP BY m.id, m.title, m.year, m.director " +
-                    "ORDER BY rating DESC " +
-                    "LIMIT 20";
+            String query = "WITH TopRatings AS (\n" +
+                            "    SELECT movieId, MAX(rating) AS max_rating\n" +
+                            "    FROM ratings\n" +
+                            "    GROUP BY movieId\n" +
+                            "    ORDER BY max_rating DESC\n" +
+                            "    LIMIT 20\n" +
+                            ")\n" +
+                            "\n" +
+                            "SELECT\n" +
+                            "    m.id,\n" +
+                            "    m.title,\n" +
+                            "    m.year,\n" +
+                            "    m.director,\n" +
+                            "    SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT g.name SEPARATOR ', '), ', ', 3) AS genres,\n" +
+                            "    SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.id SEPARATOR ', '), ', ', 3)  AS star_ids,\n" +
+                            "    SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.name SEPARATOR ', '), ', ', 3)  AS stars,\n" +
+                            "    tr.max_rating AS rating\n" +
+                            "FROM movies m\n" +
+                            "JOIN TopRatings tr ON m.id = tr.movieId\n" +
+                            "LEFT JOIN genres_in_movies gm ON m.id = gm.movieId\n" +
+                            "LEFT JOIN genres g ON gm.genreId = g.id\n" +
+                            "LEFT JOIN stars_in_movies sm ON m.id = sm.movieId\n" +
+                            "LEFT JOIN stars s ON sm.starId = s.id\n" +
+                            "GROUP BY m.id, m.title, m.year, m.director\n" +
+                            "ORDER BY rating DESC;\n";
 
             // Prepare and execute the SQL query.
             PreparedStatement statement = conn.prepareStatement(query);
