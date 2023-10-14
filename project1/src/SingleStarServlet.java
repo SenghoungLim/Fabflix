@@ -15,51 +15,44 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-// Declaring a WebServlet called SingleStarServlet, which maps to url "/api/single-star"
 @WebServlet(name = "SingleStarServlet", urlPatterns = "/api/single-star")
 public class SingleStarServlet extends HttpServlet {
-    private static final long serialVersionUID = 2L;
-
-    // Create a dataSource which registered in web.xml
+    private static final long serialVersionUID = 3L;
     private DataSource dataSource;
 
     public void init(ServletConfig config) {
         try {
-            dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/moviedbexample");
+            // Initialize the servlet by looking up the data source from the JNDI context.
+            dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/moviedb");
         } catch (NamingException e) {
-            e.printStackTrace();
+            // If there is a naming exception, throw a runtime exception.
+            throw new RuntimeException(e);
         }
     }
 
-    /**
-     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-     * response)
-     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // Set the response content type to JSON.
+        response.setContentType("application/json");
 
-        response.setContentType("application/json"); // Response mime type
-
-        // Retrieve parameter id from url request.
+        // Retrieve the "id" parameter from the URL request.
         String id = request.getParameter("id");
 
-        // The log message can be found in localhost log
-        request.getServletContext().log("getting id: " + id);
+        // Log the request for debugging purposes.
+        request.getServletContext().log("Getting id: " + id);
 
-        // Output stream to STDOUT
+        // Get an output stream for writing the response.
         PrintWriter out = response.getWriter();
 
-        // Get a connection from dataSource and let resource manager close the connection after usage.
         try (Connection conn = dataSource.getConnection()) {
-            // Get a connection from dataSource
-
-            // Construct a query with parameter represented by "?"
+            // Construct a SQL query with parameters represented by "?".
             String query = "SELECT\n" +
                     "    s.name AS StarName,\n" +
                     "    CASE\n" +
                     "        WHEN s.birthYear IS NOT NULL THEN s.birthYear\n" +
                     "        ELSE 'N/A'\n" +
                     "    END AS YearOfBirth,\n" +
-                    "    GROUP_CONCAT(DISTINCT m.titles) AS MovieTitles,\n" +
+                    "    GROUP_CONCAT(DISTINCT m.title SEPARATOR ', ') AS MovieTitles,\n" +
+                    "    GROUP_CONCAT(DISTINCT m.id SEPARATOR ', ') AS MovieIds\n" +
                     "FROM\n" +
                     "    stars AS s\n" +
                     "LEFT JOIN\n" +
@@ -69,58 +62,56 @@ public class SingleStarServlet extends HttpServlet {
                     "WHERE\n" +
                     "   s.id = ?";
 
-            // Declare our statement
+            // Declare a prepared statement to execute the query.
             PreparedStatement statement = conn.prepareStatement(query);
 
-            // Set the parameter represented by "?" in the query to the id we get from url,
-            // num 1 indicates the first "?" in the query
+            // Set the parameter represented by "?" in the query to the "id" obtained from the URL.
             statement.setString(1, id);
 
-            // Perform the query
+            // Execute the query and get the result set.
             ResultSet rs = statement.executeQuery();
 
+            // Create a JSON array to store the results.
             JsonArray jsonArray = new JsonArray();
 
-            // Iterate through each row of rs
+            // Iterate through each row in the result set.
             while (rs.next()) {
+                String starName = rs.getString("StarName");
+                String yearOfBirth = rs.getString("YearOfBirth");
+                String movieTitles = rs.getString("MovieTitles");
+                String movieIds = rs.getString("MovieIds");
 
-                String star_name = rs.getString("StarName");
-                String DOB = rs.getString("YearOfBirth");
-                String movies = rs.getString("MovieTitles");
-
-                // Create a JsonObject based on the data we retrieve from rs
-
+                // Create a JSON object for each star and add it to the array.
                 JsonObject jsonObject = new JsonObject();
-                jsonObject.addProperty("StarName", star_name);
-                jsonObject.addProperty("YearOfBirth", DOB);
-                jsonObject.addProperty("MovieTitles", movies);
+                jsonObject.addProperty("StarName", starName);
+                jsonObject.addProperty("YearOfBirth", yearOfBirth);
+                jsonObject.addProperty("MovieTitles", movieTitles);
+                jsonObject.addProperty("MovieIds", movieIds);
 
                 jsonArray.add(jsonObject);
             }
+            // Close the result set and the prepared statement.
             rs.close();
             statement.close();
 
-            // Write JSON string to output
+            // Log the number of results retrieved for debugging purposes.
+            request.getServletContext().log("Getting " + jsonArray.size() + " results");
+            // Write the JSON response to the output stream.
             out.write(jsonArray.toString());
-            // Set response status to 200 (OK)
+            // Set the response status to 200 (OK).
             response.setStatus(200);
-
         } catch (Exception e) {
-            // Write error message JSON object to output
+            // Handle exceptions by sending an error message in the JSON response.
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("errorMessage", e.getMessage());
             out.write(jsonObject.toString());
-
-            // Log error to localhost log
+            // Log the error for debugging purposes.
             request.getServletContext().log("Error:", e);
-            // Set response status to 500 (Internal Server Error)
+            // Set the response status to 500 (Internal Server Error).
             response.setStatus(500);
         } finally {
+            // Always remember to close the database connection after usage, done here by try-with-resources.
             out.close();
         }
-
-        // Always remember to close db connection after usage. Here it's done by try-with-resources
-
     }
-
 }

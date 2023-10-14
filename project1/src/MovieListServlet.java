@@ -22,26 +22,28 @@ public class MovieListServlet extends HttpServlet {
 
     public void init(ServletConfig config) {
         try {
+            // Initialize the servlet by looking up the data source from the JNDI context.
             dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/moviedb");
         } catch (NamingException e) {
             e.printStackTrace();
         }
     }
 
-
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // Set the response content type to JSON.
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
         try (Connection conn = dataSource.getConnection()) {
+            // Define the SQL query to retrieve a list of movies with associated data.
             String query = "SELECT " +
                     "m.id, " +
                     "m.title, " +
                     "m.year, " +
                     "m.director, " +
-                    "SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT g.name ORDER BY g.id ASC SEPARATOR ', '), ', ', 3) AS genres, " +
-                    "SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.id ORDER BY s.id ASC SEPARATOR ', '), ', ', 3) AS star_ids, " + // Collect star IDs
-                    "SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.name ORDER BY s.id ASC SEPARATOR ', '), ', ', 3) AS stars, " +
+                    "SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT g.name SEPARATOR ', '), ', ', 3) AS genres, " +
+                    "SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.id SEPARATOR ', '), ', ', 3) AS star_ids, " +
+                    "SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.name SEPARATOR ', '), ', ', 3) AS stars, " +
                     "MAX(r.rating) AS rating " +
                     "FROM movies m " +
                     "LEFT JOIN ratings r ON m.id = r.movieId " +
@@ -53,11 +55,13 @@ public class MovieListServlet extends HttpServlet {
                     "ORDER BY rating DESC " +
                     "LIMIT 20";
 
+            // Prepare and execute the SQL query.
             PreparedStatement statement = conn.prepareStatement(query);
             ResultSet rs = statement.executeQuery();
             JsonArray jsonArray = new JsonArray();
 
             while (rs.next()) {
+                // Retrieve data from the result set for each movie.
                 String id = rs.getString("id");
                 String title = rs.getString("title");
                 String year = rs.getString("year");
@@ -67,6 +71,7 @@ public class MovieListServlet extends HttpServlet {
                 String stars = rs.getString("stars");
                 String rating = rs.getString("rating");
 
+                // Create a JSON object to represent the movie and add it to the JSON array.
                 JsonObject jsonObject = new JsonObject();
                 jsonObject.addProperty("id", id);
                 jsonObject.addProperty("title", title);
@@ -82,14 +87,16 @@ public class MovieListServlet extends HttpServlet {
             rs.close();
             statement.close();
 
+            // Log the number of results retrieved and send the JSON response to the client.
             request.getServletContext().log("getting " + jsonArray.size() + " results");
-
             out.write(jsonArray.toString());
             response.setStatus(200);
         } catch (Exception e) {
+            // Handle exceptions by sending an error message in the JSON response.
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("errorMessage", e.getMessage());
             out.write(jsonObject.toString());
+            request.getServletContext().log("Error:", e);
             response.setStatus(500);
         } finally {
             out.close();

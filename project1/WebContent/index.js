@@ -1,5 +1,5 @@
 /**
- * Handles the data returned by the API, reads the jsonObject and populates data into html elements
+ * Handles the data returned by the API, reads the jsonObject, and populates data into HTML elements
  * @param resultData jsonObject
  */
 function handleMovieResult(resultData) {
@@ -18,13 +18,13 @@ function handleMovieResult(resultData) {
         rowHTML += "<td>" + resultData[i]["director"] + "</td>";
         rowHTML += "<td>" + resultData[i]["genres"] + "</td>";
 
-        let stars = resultData[i]["stars"].split(',');
-        let starIds = resultData[i]["star_ids"].split(',');
+        let stars = resultData[i]["stars"].split(', ');
+        let starIds = resultData[i]["star_ids"].split(', ');
 
         rowHTML += "<td>";
         // Create hyperlinks for each star
         for (let j = 0; j < stars.length; j++) {
-            rowHTML += "<a href='single-star.html?id=" +  starIds[j] + "'>"  + stars[j] +  "</a>";
+            rowHTML += "<a href='single-star.html?id=" + starIds[j] + "'>" + stars[j] + "</a>";
             if (j < stars.length - 1) {
                 rowHTML += ", ";
             }
@@ -48,5 +48,5 @@ jQuery.ajax({
     dataType: "json", // Setting return data type
     method: "GET", // Setting request method
     url: "api/movie-list", // Setting request URL, which should return movie data
-    success: (resultData) => handleMovieResult(resultData) // Setting callback function to handle data returned successfully by the MovieListServlet
+    success: (resultData) => handleMovieResult(resultData) // Setting a callback function to handle data returned successfully by the MovieListServlet
 });

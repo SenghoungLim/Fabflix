@@ -12,19 +12,20 @@
     <title>Single Star</title>
 </head>
 <body>
-<h1>Single Star Page</h1>
-
-<!-- Empty elements to be populated with star details by single-star.js -->
-<h3 id="star_name"></h3>
-<p id="star_year_of_birth"></p>
-<p id="star_movies"></p>
+<div class="container ss">
+    <h1>Single Star</h1>
+    <a href="index.html" class="btn btn-primary">Home</a> <!-- Home button -->
+    <table class="table table-striped">
+        <tbody id="star-table">
+        <!-- Data will be populated here using JavaScript -->
+        </tbody>
+    </table>
+</div>
 
 <!-- Load jQuery and Bootstrap JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-
-<!-- Load our own JS file for populating star details -->
 <script src="single-star.js"></script>
 </body>
 </html>

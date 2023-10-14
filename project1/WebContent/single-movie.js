@@ -20,31 +20,50 @@ function getParameterByName(target) {
 function handleResult(resultData) {
     console.log("handleResult: populating movie details from resultData");
 
-    let movieTitleElement = jQuery("#movie_title");
-    let movieYearElement = jQuery("#movie_year");
-    let movieDirectorElement = jQuery("#movie_director");
-    let movieGenresElement = jQuery("#movie_genres");
-    let movieStarsElement = jQuery("#movie_stars");
-    let movieRatingElement = jQuery("#movie_rating");
+    let movieTable = jQuery("#movie_table");
+
+    // Clear the table if it contains data
+    movieTable.empty();
 
     let title = resultData[0]["title"];
     let year = resultData[0]["year"];
     let director = resultData[0]["director"];
     let genres = resultData[0]["genres"];
-    let stars = resultData[0]["stars"];
+    let stars = resultData[0]["stars"].split(', ');
+    let starIds = resultData[0]["star_ids"].split(', ');
     let rating = resultData[0]["rating"];
 
-    movieTitleElement.text("Title: " + title);
-    movieYearElement.text("Year: " + year);
-    movieDirectorElement.text("Director: " + director);
-    movieGenresElement.text("Genres: " + genres);
-    movieStarsElement.text("Stars: " + stars);
-    movieRatingElement.text("Rating: " + rating);
+    // Create a table row for each movie detail
+    let titleRow = '<tr><th>Title:</th><td>' + title + '</td></tr>';
+    let yearRow = '<tr><th>Year:</th><td>' + year + '</td></tr>';
+    let directorRow = '<tr><th>Director:</th><td>' + director + '</td></tr>';
+    let genresRow = '<tr><th>Genres:</th><td>' + genres + '</td></tr>';
+
+    let starsRow = '<tr><th>Stars:</th><td>';
+    // Create hyperlinks for each star
+    for (let j = 0; j < stars.length; j++) {
+        starsRow += "<a href='single-star.html?id=" +  starIds[j] + "'>"  + stars[j] +  "</a>";
+        if (j < stars.length - 1) {
+            starsRow += ", ";
+        }
+    }
+    starsRow += '</td></tr>';
+
+    let ratingRow = '<tr><th>Rating:</th><td>' + rating + '</td></tr>';
+
+    // Append the rows to the table
+    movieTable.append(titleRow);
+    movieTable.append(yearRow);
+    movieTable.append(directorRow);
+    movieTable.append(genresRow);
+    movieTable.append(starsRow);
+    movieTable.append(ratingRow);
 }
 
-console.log(getParameterByName('id'));
+// Get the movie ID from the URL
 let movieId = getParameterByName('id');
 
+// Make an AJAX request to retrieve movie details
 jQuery.ajax({
     dataType: "json",
     method: "GET",

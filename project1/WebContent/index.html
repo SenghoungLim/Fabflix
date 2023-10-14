@@ -12,33 +12,33 @@
     <title>Movie List</title>
 </head>
 <body>
-<h1>Movies</h1>
+<div class="container">
+    <h1>Movie List</h1>
+    <a href="index.html" class="btn btn-primary">Home</a> <!-- Home button -->
 
-<!-- Id "movie_table" is useful for jQuery to find the html element with id, class here is mapping to Bootstrap defined class CSS -->
-<table id="movie_table" class="table table-striped">
-    <!-- Create a table header -->
-    <thead>
-    <tr>
-        <!-- Titles of each column-->
-        <th>Title</th>
-        <th>Year</th>
-        <th>Director</th>
-        <th>Genres</th>
-        <th>Stars</th>
-        <th>Rating</th>
-    </tr>
-    </thead>
-    <!-- Table body is left empty here, will be populated with the data retrieved with index.js -->
-    <!-- Again, id "movie_list_table_body" is useful for jQuery to find this html element -->
-    <tbody id="movie_list_table_body"></tbody>
-</table>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Year</th>
+            <th>Director</th>
+            <th>Genres</th>
+            <th>Stars</th>
+            <th>Rating</th>
+        </tr>
+        </thead>
+        <tbody id="movie_list_table_body">
+        <!-- Data will be dynamically populated here by JavaScript -->
+        </tbody>
+    </table>
+</div>
 
 <!-- Load jQuery and Bootstrap JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 
-<!-- Load our own JS file -->
+<!-- Load your custom JavaScript file for populating the movie list -->
 <script src="index.js"></script>
 </body>
 </html>

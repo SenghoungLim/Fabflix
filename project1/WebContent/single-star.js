@@ -20,22 +20,40 @@ function getParameterByName(target) {
 function handleResult(resultData) {
     console.log("handleResult: populating star details from resultData");
 
-    let starNameElement = jQuery("#star_name");
-    let starYearOfBirthElement = jQuery("#star_year_of_birth");
-    let starMoviesElement = jQuery("#star_movies");
+    let starTable = jQuery("#star-table");
 
-    let StarName = resultData[0]["StarName"];
-    let YearOfBirth = resultData[0]["YearOfBirth"];
-    let MovieTitles = resultData[0]["MovieTitles"];
+    // Clear the table if it contains data
+    starTable.empty();
 
-    starNameElement.text("Name: " + StarName);
-    starYearOfBirthElement.text("Year of Birth: " + YearOfBirth);
-    starMoviesElement.text("Movies: " + MovieTitles);
+    let starName = resultData[0]["StarName"];
+    let yearOfBirth = resultData[0]["YearOfBirth"];
+    let movieTitles = resultData[0]["MovieTitles"].split(', ');
+    let movieIds = resultData[0]["MovieIds"].split(', ');
+
+    // Create a table row for each star detail
+    let nameRow = '<tr><th>Name:</th><td>' + starName + '</td></tr>';
+    let yearRow = '<tr><th>Year:</th><td>' + yearOfBirth + '</td></tr>';
+
+    let moviesRow = '<tr><th>Movies:</th><td>';
+    // Create hyperlinks for each movie
+    for (let j = 0; j < movieTitles.length; j++) {
+        moviesRow += "<a href='single-movie.html?id=" +  movieIds[j] + "'>"  + movieTitles[j] +  "</a>";
+        if (j < movieTitles.length - 1) {
+            moviesRow += ", ";
+        }
+    }
+    moviesRow += '</td></tr>';
+
+    // Append the rows to the table
+    starTable.append(nameRow);
+    starTable.append(yearRow);
+    starTable.append(moviesRow);
 }
 
-console.log(getParameterByName('starID'));
-let starId = getParameterByName('starID');
+// Get the star ID from the URL
+let starId = getParameterByName('id');
 
+// Make an AJAX request to retrieve star details
 jQuery.ajax({
     dataType: "json",
     method: "GET",
