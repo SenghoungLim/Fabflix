@@ -12,8 +12,8 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 
 @WebServlet(name = "MovieListServlet", urlPatterns = "/api/movie-list")
 public class MovieListServlet extends HttpServlet {
@@ -28,40 +28,33 @@ public class MovieListServlet extends HttpServlet {
         }
     }
 
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
         try (Connection conn = dataSource.getConnection()) {
-            Statement statement = conn.createStatement();
-
-            String query = "SELECT\n" +
-                    "    m.id,\n" +
-                    "    m.title,\n" +
-                    "    m.year,\n" +
-                    "    m.director,\n" +
-                    "    SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT g.name ORDER BY g.id ASC SEPARATOR ', '), ', ', 3) AS genres,\n" +
-                    "    SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.name ORDER BY s.id ASC SEPARATOR ', '), ', ', 3) AS stars,\n" +
-                    "    MAX(r.rating) AS rating\n" +
-                    "FROM\n" +
-                    "    movies m\n" +
-                    "LEFT JOIN\n" +
-                    "    ratings r ON m.id = r.movieId\n" +
-                    "LEFT JOIN\n" +
-                    "    genres_in_movies gm ON m.id = gm.movieId\n" +
-                    "LEFT JOIN\n" +
-                    "    genres g ON gm.genreId = g.id\n" +
-                    "LEFT JOIN\n" +
-                    "    stars_in_movies sm ON m.id = sm.movieId\n" +
-                    "LEFT JOIN\n" +
-                    "    stars s ON sm.starId = s.id\n" +
-                    "GROUP BY\n" +
-                    "    m.id, m.title, m.year, m.director\n" +
-                    "ORDER BY\n" +
-                    "    rating DESC\n" +
+            String query = "SELECT " +
+                    "m.id, " +
+                    "m.title, " +
+                    "m.year, " +
+                    "m.director, " +
+                    "SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT g.name ORDER BY g.id ASC SEPARATOR ', '), ', ', 3) AS genres, " +
+                    "SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.id ORDER BY s.id ASC SEPARATOR ', '), ', ', 3) AS star_ids, " + // Collect star IDs
+                    "SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.name ORDER BY s.id ASC SEPARATOR ', '), ', ', 3) AS stars, " +
+                    "MAX(r.rating) AS rating " +
+                    "FROM movies m " +
+                    "LEFT JOIN ratings r ON m.id = r.movieId " +
+                    "LEFT JOIN genres_in_movies gm ON m.id = gm.movieId " +
+                    "LEFT JOIN genres g ON gm.genreId = g.id " +
+                    "LEFT JOIN stars_in_movies sm ON m.id = sm.movieId " +
+                    "LEFT JOIN stars s ON sm.starId = s.id " +
+                    "GROUP BY m.id, m.title, m.year, m.director " +
+                    "ORDER BY rating DESC " +
                     "LIMIT 20";
 
-            ResultSet rs = statement.executeQuery(query);
+            PreparedStatement statement = conn.prepareStatement(query);
+            ResultSet rs = statement.executeQuery();
             JsonArray jsonArray = new JsonArray();
 
             while (rs.next()) {
@@ -70,6 +63,7 @@ public class MovieListServlet extends HttpServlet {
                 String year = rs.getString("year");
                 String director = rs.getString("director");
                 String genres = rs.getString("genres");
+                String star_ids = rs.getString("star_ids");
                 String stars = rs.getString("stars");
                 String rating = rs.getString("rating");
 
@@ -79,6 +73,7 @@ public class MovieListServlet extends HttpServlet {
                 jsonObject.addProperty("year", year);
                 jsonObject.addProperty("director", director);
                 jsonObject.addProperty("genres", genres);
+                jsonObject.addProperty("star_ids", star_ids);
                 jsonObject.addProperty("stars", stars);
                 jsonObject.addProperty("rating", rating);
 

@@ -16,8 +16,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 // Declaring a WebServlet called SingleStarServlet, which maps to url "/api/single-star"
-@WebServlet(name = "SingleMovieServlet", urlPatterns = "/api/single-movie")
-public class SingleMovieServlet extends HttpServlet {
+@WebServlet(name = "SingleStarServlet", urlPatterns = "/api/single-star")
+public class SingleStarServlet extends HttpServlet {
     private static final long serialVersionUID = 2L;
 
     // Create a dataSource which registered in web.xml
@@ -25,7 +25,7 @@ public class SingleMovieServlet extends HttpServlet {
 
     public void init(ServletConfig config) {
         try {
-            dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/moviedb");
+            dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/moviedbexample");
         } catch (NamingException e) {
             e.printStackTrace();
         }
@@ -54,20 +54,20 @@ public class SingleMovieServlet extends HttpServlet {
 
             // Construct a query with parameter represented by "?"
             String query = "SELECT\n" +
-                    "    s.id AS starID,\n" +
-                    "    m.title,\n" +
-                    "    m.year,\n" +
-                    "    m.director,\n" +
-                    "    GROUP_CONCAT(DISTINCT g.name) AS genres,\n" +
-                    "    GROUP_CONCAT(DISTINCT s.name) AS stars,\n" +
-                    "    MAX(r.rating) AS rating\n" +
-                    "FROM movies m\n" +
-                    "LEFT JOIN ratings r ON m.id = r.movieId\n" +
-                    "LEFT JOIN genres_in_movies gm ON m.id = gm.movieId\n" +
-                    "LEFT JOIN genres g ON gm.genreId = g.id\n" +
-                    "LEFT JOIN stars_in_movies sm ON m.id = sm.movieId\n" +
-                    "LEFT JOIN stars s ON sm.starId = s.id\n" +
-                    "WHERE m.id = ?";
+                    "    s.name AS StarName,\n" +
+                    "    CASE\n" +
+                    "        WHEN s.birthYear IS NOT NULL THEN s.birthYear\n" +
+                    "        ELSE 'N/A'\n" +
+                    "    END AS YearOfBirth,\n" +
+                    "    GROUP_CONCAT(DISTINCT m.titles) AS MovieTitles,\n" +
+                    "FROM\n" +
+                    "    stars AS s\n" +
+                    "LEFT JOIN\n" +
+                    "    stars_in_movies AS sm ON s.id = sm.starId\n" +
+                    "LEFT JOIN\n" +
+                    "    movies AS m ON sm.movieId = m.id\n" +
+                    "WHERE\n" +
+                    "   s.id = ?";
 
             // Declare our statement
             PreparedStatement statement = conn.prepareStatement(query);
@@ -83,28 +83,20 @@ public class SingleMovieServlet extends HttpServlet {
 
             // Iterate through each row of rs
             while (rs.next()) {
-                String star_id = rs.getString("starID");
-                String title = rs.getString("title");
-                String year = rs.getString("year");
-                String director = rs.getString("director");
-                String genres = rs.getString("genres");
-                String stars = rs.getString("stars");
-                String rating = rs.getString("rating");
 
+                String star_name = rs.getString("StarName");
+                String DOB = rs.getString("YearOfBirth");
+                String movies = rs.getString("MovieTitles");
+
+                // Create a JsonObject based on the data we retrieve from rs
 
                 JsonObject jsonObject = new JsonObject();
-                jsonObject.addProperty("starID", star_id);
-                jsonObject.addProperty("title", title);
-                jsonObject.addProperty("year", year);
-                jsonObject.addProperty("director", director);
-                jsonObject.addProperty("genres", genres);
-                jsonObject.addProperty("stars", stars);
-                jsonObject.addProperty("rating", rating);
-
+                jsonObject.addProperty("StarName", star_name);
+                jsonObject.addProperty("YearOfBirth", DOB);
+                jsonObject.addProperty("MovieTitles", movies);
 
                 jsonArray.add(jsonObject);
             }
-
             rs.close();
             statement.close();
 

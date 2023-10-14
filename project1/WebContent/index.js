@@ -17,7 +17,20 @@ function handleMovieResult(resultData) {
         rowHTML += "<td>" + resultData[i]["year"] + "</td>";
         rowHTML += "<td>" + resultData[i]["director"] + "</td>";
         rowHTML += "<td>" + resultData[i]["genres"] + "</td>";
-        rowHTML += "<td>" + resultData[i]["stars"] + "</td>";
+
+        let stars = resultData[i]["stars"].split(',');
+        let starIds = resultData[i]["star_ids"].split(',');
+
+        rowHTML += "<td>";
+        // Create hyperlinks for each star
+        for (let j = 0; j < stars.length; j++) {
+            rowHTML += "<a href='single-star.html?id=" +  starIds[j] + "'>"  + stars[j] +  "</a>";
+            if (j < stars.length - 1) {
+                rowHTML += ", ";
+            }
+        }
+        rowHTML += "</td>";
+
         rowHTML += "<td>" + resultData[i]["rating"] + "</td>";
         rowHTML += "</tr>";
 
