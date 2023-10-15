@@ -4,7 +4,7 @@
   - Both:
     - Step 1 - 4
     - Debugging and troubleshooting 
-  - Thien Vo:
+  - Thien Toan Vu:
     - Movie list and stars servlets
     - JavaScript API files
   - Senghoung Lim
