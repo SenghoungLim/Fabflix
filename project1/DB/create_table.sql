@@ -1,4 +1,5 @@
 CREATE database moviedb;
+USE moviedb;
 CREATE TABLE IF NOT EXISTS movies (
     id VARCHAR(10) PRIMARY KEY,
     title VARCHAR(100) NOT NULL,
