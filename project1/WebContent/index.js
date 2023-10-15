@@ -5,37 +5,39 @@
 function handleMovieResult(resultData) {
     console.log("handleMovieResult: populating movie list table from resultData");
 
-    // Populate the movie table
-    // Find the empty table body by id "movie_list_table_body"
-    let movieListTableBodyElement = jQuery("#movie_list_table_body");
+    // Find the empty container by ID "movieCard"
+    let movieList = jQuery("#movieList");
 
-    // Iterate through resultData, no more than 20 entries (as per your SQL query)
-    for (let i = 0; i < Math.min(20, resultData.length); i++) {
-        // Concatenate the HTML tags with resultData jsonObject
-        let rowHTML = "<tr>";
-        rowHTML += "<td><a href='single-movie.html?id=" + resultData[i]["id"] + "'>" + resultData[i]["title"] + "</a></td>";
-        rowHTML += "<td>" + resultData[i]["year"] + "</td>";
-        rowHTML += "<td>" + resultData[i]["director"] + "</td>";
-        rowHTML += "<td>" + resultData[i]["genres"] + "</td>";
+    // Create a row for every three movies
+    for (let i = 0; i < 20; i += 3) {
+        // Create a new row
+        let rowHTML = "<div class='row'>" ;
+        // Loop through up to three movies within this row
+        for (let j = 0; j < 3 && (i + j) < resultData.length; j++) {
+            rowHTML += "<div class='col-sm movie-card'>";
+            rowHTML += "<h5><a href='single-movie.html?id=" + resultData[i + j]["id"] + "'>" + resultData[i + j]["title"] + "</a>"+"</h5>";
+            rowHTML += "<p>Year: " + resultData[i + j]["year"] + "</p>";
+            rowHTML += "<p>Director: " + resultData[i + j]["director"] + "</p>";
+            rowHTML += "<p>Genres: " + resultData[i + j]["genres"] + "</p>";
 
-        let stars = resultData[i]["stars"].split(', ');
-        let starIds = resultData[i]["star_ids"].split(', ');
+            let stars = resultData[i + j]["stars"].split(', ');
+            let starIds = resultData[i + j]["star_ids"].split(', ');
+            rowHTML += "<p>Stars: ";
 
-        rowHTML += "<td>";
-        // Create hyperlinks for each star
-        for (let j = 0; j < stars.length; j++) {
-            rowHTML += "<a href='single-star.html?id=" + starIds[j] + "'>" + stars[j] + "</a>";
-            if (j < stars.length - 1) {
-                rowHTML += ", ";
+            // Create hyperlinks for each star
+            for (let k = 0; k < stars.length; k++) {
+                rowHTML += "<a href='single-star.html?id=" + starIds[k] + "'>" + stars[k] + "</a>";
+                if (k < stars.length - 1) {
+                    rowHTML += ", ";
+                }
             }
+            rowHTML += "</p>";
+            rowHTML += "<p>Rating: " + resultData[i + j]["rating"] + "</p>";
+            rowHTML += "</div>";
         }
-        rowHTML += "</td>";
 
-        rowHTML += "<td>" + resultData[i]["rating"] + "</td>";
-        rowHTML += "</tr>";
-
-        // Append the row created to the table body, which will refresh the page
-        movieListTableBodyElement.append(rowHTML);
+        rowHTML += "</div>"; // Close the row
+        movieList.append(rowHTML); // Append the row to the container
     }
 }
 
