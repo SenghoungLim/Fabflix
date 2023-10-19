@@ -1,5 +1,5 @@
 # CS122B Project 1
-- [Demo Video Link](https://youtu.be/IFSWjEaqFoQ)
+- [Demo Video Link](https://www.youtube.com/watch?v=IFSWjEaqFoQ)
 ### Member Distribution
   - Both:
     - Step 1 - 4
