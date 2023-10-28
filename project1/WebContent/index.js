@@ -5,17 +5,17 @@
 function handleMovieResult(resultData) {
     console.log("handleMovieResult: populating movie list table from resultData");
 
-    // Find the empty container by ID "movieCard"
+    // Find the empty container by ID "movieList"
     let movieList = jQuery("#movieList");
 
     // Create a row for every three movies
     for (let i = 0; i < 20; i += 3) {
         // Create a new row
-        let rowHTML = "<div class='row'>" ;
+        let rowHTML = "<div class='row'>";
         // Loop through up to three movies within this row
         for (let j = 0; j < 3 && (i + j) < resultData.length; j++) {
             rowHTML += "<div class='col-sm movie-card'>";
-            rowHTML += "<h5><a href='single-movie.html?id=" + resultData[i + j]["id"] + "'>" + resultData[i + j]["title"] + "</a>"+"</h5>";
+            rowHTML += "<h5><a href='single-movie.html?id=" + resultData[i + j]["id"] + "'>" + resultData[i + j]["title"] + "</a></h5>";
             rowHTML += "<p>Year: " + resultData[i + j]["year"] + "</p>";
             rowHTML += "<p>Director: " + resultData[i + j]["director"] + "</p>";
             rowHTML += "<p>Genres: " + resultData[i + j]["genres"] + "</p>";
@@ -41,9 +41,27 @@ function handleMovieResult(resultData) {
     }
 }
 
-/**
- * Once this .js is loaded, the following scripts will be executed by the browser
- */
+$(document).ready(function () {
+    // Add a submit event listener to the search form
+    $("#searchForm").submit(function (event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        // Get the form data
+        const formData = $(this).serialize();
+
+        // Make an AJAX request with the form data
+        $.ajax({
+            dataType: "json",
+            method: "GET",
+            url: "api/form",
+            data: formData,
+            success: function (resultData) {
+                // Redirect to the search results page with the search results as a query parameter
+                window.location = "search.html?results=" + encodeURIComponent(JSON.stringify(resultData));
+            }
+        });
+    });
+});
 
 // Makes the HTTP GET request and registers the success callback function handleMovieResult
 jQuery.ajax({

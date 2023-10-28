@@ -12,32 +12,33 @@
     <title>Movie List</title>
 </head>
 <body>
-<div class="container" id = "movieList">
-    <h1>Top 20 Rated Movies</h1>
+<div class="container">
+    <h1>Fabflix</h1>
     <a href="index.html" class="btn btn-primary">Home</a> <!-- Home button -->
 
-<!--    <table class="table">-->
-<!--        <thead>-->
-<!--        <tr>-->
-<!--            <th>Title</th>-->
-<!--            <th>Year</th>-->
-<!--            <th>Director</th>-->
-<!--            <th>Genres</th>-->
-<!--            <th>Stars</th>-->
-<!--            <th>Rating</th>-->
-<!--        </tr>-->
-<!--        </thead>-->
-<!--        <tbody id="movie_list_table_body">-->
-<!--        &lt;!&ndash; Data will be dynamically populated here by JavaScript &ndash;&gt;-->
-<!--        </tbody>-->
-<!--    </table>-->
-</div>
+    <!-- Update the search form to include an ID attribute and prevent the default form submission -->
+    <form id="searchForm">
+        Title: <input type="text" name="title">
+        Year: <input type="text" name="year">
+        Director: <input type="text" name="director">
+        Star Name: <input type="text" name="star-name">
+        <input type="submit" value="Search">
+    </form>
 
+    <h2>Top 20 Rated Movies</h2>
+
+    <table class="table">
+        <tbody id="movieList">
+        <!-- Data will be dynamically populated here by JavaScript -->
+        </tbody>
+    </table>
+</div>
 
 <!-- Load jQuery and Bootstrap JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-<script src="index.js"></script>
+<!-- Include your index.js for handling form submission -->
+<script src="./index.js"></script>
 </body>
 </html>
