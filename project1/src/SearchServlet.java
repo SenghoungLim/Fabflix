@@ -95,6 +95,7 @@ public class SearchServlet extends HttpServlet {
 
             // Iterate through each row in the result set.
             while (rs.next()) {
+                String id = rs.getString("id");
                 String mtitle = rs.getString("title");
                 String myear = rs.getString("year");
                 String mdirector = rs.getString("director");
@@ -105,6 +106,7 @@ public class SearchServlet extends HttpServlet {
 
                 // Create a JSON object for each movie and add it to the array.
                 JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("id", id);
                 jsonObject.addProperty("title", mtitle);
                 jsonObject.addProperty("year", myear);
                 jsonObject.addProperty("director", mdirector);
