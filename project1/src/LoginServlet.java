@@ -1,6 +1,7 @@
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import com.google.gson.JsonObject;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -21,7 +22,7 @@ import jakarta.servlet.http.HttpSession;
  */
 
 // Declaring a WebServlet called FormServlet, which maps to url "/form"
-@WebServlet(name = "FormServlet", urlPatterns = "/login")
+@WebServlet(name = "LoginServlet", urlPatterns = "/api/login")
 public class LoginServlet extends HttpServlet {
 
     // Create a dataSource which registered in web.xml
@@ -42,7 +43,7 @@ public class LoginServlet extends HttpServlet {
 
         // Output stream to STDOUT
         PrintWriter out = response.getWriter();
-
+        System.out.println("LoginServlet Started");
 
         try {
 
@@ -65,24 +66,32 @@ public class LoginServlet extends HttpServlet {
 
             // Perform the query
             ResultSet rs = preparedStatement.executeQuery();
-
+            JsonObject responseJsonObject = new JsonObject();
             // Process the data
             if (rs.next()) {
                 HttpSession session = request.getSession(true);
-                System.out.println("Session attribute 'loggedIn' set to: " + session.getAttribute("loggedIn"));
-                session.equals(username);
-                response.sendRedirect(request.getContextPath()+"/session");
+                session.setAttribute("user", new User(username));
+                session.setAttribute("loggedIn", "true");
+                responseJsonObject.addProperty("status", "success");
+                responseJsonObject.addProperty("message", "success");
+                response.sendRedirect(request.getContextPath() + "/index.html");
             }
             else{
-                out.println("Login Failed :(");
+                // Login fail
+                responseJsonObject.addProperty("status", "fail");
+                // Log to localhost log
+                request.getServletContext().log("Login failed");
+                // sample error messages. in practice, it is not a good idea to tell user which one is incorrect/not exist.
+                if (!username.equals(username)) {
+                    responseJsonObject.addProperty("message", "user " + username + " doesn't exist");
+                } else {
+                    responseJsonObject.addProperty("message", "incorrect password");
+                }
             }
-
-            // Close all structures
+            response.getWriter().write(responseJsonObject.toString());
             rs.close();
             statement.close();
             dbCon.close();
-
-
 
         } catch (Exception e) {
             /*

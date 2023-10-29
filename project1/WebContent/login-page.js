@@ -1,4 +1,4 @@
-let login_form = $("#login-form");
+let login_form = $("#login_form");
 
 /**
  * Handle the data returned by LoginServlet
@@ -48,3 +48,4 @@ function submitLoginForm(formSubmitEvent) {
 
 // Bind the submit action of the form to a handler function
 login_form.submit(submitLoginForm);
+

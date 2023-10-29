@@ -18,29 +18,32 @@ public class SessionServlet extends HttpServlet {
         // Get a instance of current session on the request
         HttpSession session = request.getSession(true);
 
-        String heading;
+        // Check if the user is logged in
+//        Boolean isLoggedIn = (Boolean) session.getAttribute("loggedIn");
+//        if (isLoggedIn != null && isLoggedIn) {
+//            // User is logged in; display appropriate message or perform actions
+//            out.println("Welcome, logged-in user!");
+//        } else {
+//            // User is not logged in; display appropriate message or take other actions
+//            out.println("Welcome, guest!");
+//        }
 
-        // Retrieve the "loggedIn" attribute from the session
-        Boolean loggedIn = (Boolean) session.getAttribute("loggedIn");
-
-        // Retrieve data named "accessCount" from session, which count how many times the user requested before
-        Integer accessCount = (Integer) session.getAttribute("accessCount");
-        if (accessCount == null) {
-            // Which means the user is never seen before
-            accessCount = 0;
-            heading = "Welcome, New-Comer";
-            out.println("LoggedIN: First Timer!");
-        } else {
-            // Which means the user has requested before, thus user information can be found in the session
-            heading = "Welcome Back";
-            accessCount++;
-            out.println("LoggedIN: Welcome Back!");
-            accessCount++;
-            System.out.println("Session attribute 'accessCount' is: " + session.getAttribute("accessCount"));
-            //response.sendRedirect("index.html"); // Redirect to index.html
-        }
-        // Update the new accessCount to session, replacing the old value if existed
-        session.setAttribute("accessCount", accessCount);
+//        // Retrieve data named "accessCount" from session, which count how many times the user requested before
+//        Integer accessCount = (Integer) session.getAttribute("accessCount");
+//        if (accessCount == null) {
+//            // Which means the user is never seen before
+//            accessCount = 0;
+//            System.out.println("LoggedIN: First Timer!");
+//
+//        } else {
+//            // Which means the user has requested before, thus user information can be found in the session
+//            accessCount++;
+//            System.out.println("LoggedIN: Welcome Back!");
+//            accessCount++;
+//            System.out.println("Session attribute 'accessCount' is: " + session.getAttribute("accessCount"));
+//        }
+//        // Update the new accessCount to session, replacing the old value if existed
+//        session.setAttribute("accessCount", accessCount);
     }
 }
 
