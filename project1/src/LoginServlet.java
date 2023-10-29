@@ -14,7 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-
+import jakarta.servlet.http.HttpSession;
 /**
  * A servlet that takes input from a html <form> and talks to MySQL moviedbexample,
  * generates output as a html <table>
@@ -34,7 +34,6 @@ public class LoginServlet extends HttpServlet {
             e.printStackTrace();
         }
     }
-
     // Use http POST
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
@@ -43,12 +42,6 @@ public class LoginServlet extends HttpServlet {
 
         // Output stream to STDOUT
         PrintWriter out = response.getWriter();
-
-        // Building page head with title
-        out.println("<html><head><title>MovieDBExample: Found Records</title></head>");
-
-        // Building page body
-        out.println("<body><h1>MovieDBExample: Found Records</h1>");
 
 
         try {
@@ -75,20 +68,14 @@ public class LoginServlet extends HttpServlet {
 
             // Process the data
             if (rs.next()) {
-                //Redirect to homepage
-                RequestDispatcher rd = request.getRequestDispatcher("index.html");
-                rd.forward(request, response);
+                HttpSession session = request.getSession(true);
+                System.out.println("Session attribute 'loggedIn' set to: " + session.getAttribute("loggedIn"));
+                session.equals(username);
+                response.sendRedirect(request.getContextPath()+"/session");
             }
             else{
                 out.println("Login Failed :(");
             }
-            //Testing
-//            while (rs.next()) {
-//                String m_ID = rs.getString("ID");
-//                String m_Name = rs.getString("firstName");
-//                out.println(String.format("<tr><td>%s</td><td>%s</td></tr>", m_ID, m_Name));
-//            }
-//            out.println("</table>");
 
             // Close all structures
             rs.close();

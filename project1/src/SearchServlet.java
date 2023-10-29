@@ -68,18 +68,21 @@ public class SearchServlet extends HttpServlet {
                     "LEFT JOIN stars s ON sm.starId = s.id\n" +
                     "WHERE 1 = 1"; // Initialize the WHERE clause
 
-            if (title.trim().length() > 0) {
-                query += String.format(" AND m.title LIKE '%s%%'", title);
+            if (title != null && !title.isEmpty()) {
+                query += String.format(" AND m.title LIKE '%s%%'", title.trim());
             }
-            if (year.trim().length() > 0) {
-                query += String.format(" AND m.year = '%s'", year);
+            if (year != null && !year.isEmpty()) {
+                query += String.format(" AND m.year = '%s'", year.trim());
             }
-            if (director.trim().length() > 0) {
-                query += String.format(" AND m.director LIKE '%s%%'", director);
+            if (director != null && !director.isEmpty()) {
+                query += String.format(" AND m.director LIKE '%s%%'", director.trim());
             }
-            if (star_name.trim().length() > 0) {
+            if (star_name != null && star_name.isEmpty()) {
                 query += String.format(" AND s.name LIKE '%s%%'", star_name);
             }
+//            if (star_name != null && star_name.isEmpty()) {
+//                query += String.format(" AND s.name LIKE '%s%%'", star_name.trim());
+//            }
 
             query += " GROUP BY m.id, m.title, m.year, m.director";
 
