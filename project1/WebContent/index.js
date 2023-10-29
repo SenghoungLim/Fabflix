@@ -41,27 +41,27 @@ function handleMovieResult(resultData) {
     }
 }
 
-$(document).ready(function () {
-    // Add a submit event listener to the search form
-    $("#searchForm").submit(function (event) {
-        event.preventDefault(); // Prevent the default form submission
-
-        // Get the form data
-        const formData = $(this).serialize();
-
-        // Make an AJAX request with the form data
-        $.ajax({
-            dataType: "json",
-            method: "GET",
-            url: "api/form",
-            data: formData,
-            success: function (resultData) {
-                // Redirect to the search results page with the search results as a query parameter
-                window.location = "search.html?results=" + encodeURIComponent(JSON.stringify(resultData));
-            }
-        });
-    });
-});
+// $(document).ready(function () {
+//     // Add a submit event listener to the search form
+//     $("#searchForm").submit(function (event) {
+//         event.preventDefault(); // Prevent the default form submission
+//
+//         // Get the form data
+//         const formData = $(this).serialize();
+//
+//         // Make an AJAX request with the form data
+//         $.ajax({
+//             dataType: "json",
+//             method: "GET",
+//             url: "api/form",
+//             data: formData,
+//             success: function (resultData) {
+//                 // Redirect to the search results page with the search results as a query parameter
+//                 window.location = "search.html?results=" + encodeURIComponent(JSON.stringify(resultData));
+//             }
+//         });
+//     });
+// });
 
 // Makes the HTTP GET request and registers the success callback function handleMovieResult
 jQuery.ajax({

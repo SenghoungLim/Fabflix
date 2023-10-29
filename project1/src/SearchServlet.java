@@ -48,7 +48,7 @@ public class SearchServlet extends HttpServlet {
             String title = request.getParameter("title");
             String year = request.getParameter("year");
             String director = request.getParameter("director");
-            String star_name = request.getParameter("star-name");
+            String star_name = request.getParameter("starName");
 
             // Generate a SQL query
             String query = "SELECT\n" +

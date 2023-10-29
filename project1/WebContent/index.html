@@ -18,10 +18,10 @@
 
     <!-- Update the search form to include an ID attribute and prevent the default form submission -->
     <form id="searchForm">
-        Title: <input type="text" name="title">
-        Year: <input type="text" name="year">
-        Director: <input type="text" name="director">
-        Star Name: <input type="text" name="star-name">
+        Title: <input type="text" name="title" id = "title">
+        Year: <input type="text" name="year" id  = "year">
+        Director: <input type="text" name="director" id = "director">
+        Star Name: <input type="text" name="starName" id = "starName">
         <input type="submit" value="Search">
     </form>
 
@@ -29,6 +29,11 @@
 
     <table class="table">
         <tbody id="movieList">
+        <!-- Data will be dynamically populated here by JavaScript -->
+        </tbody>
+    </table>
+    <table class="table">
+        <tbody id="search-results">
         <!-- Data will be dynamically populated here by JavaScript -->
         </tbody>
     </table>
@@ -40,5 +45,6 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 <!-- Include your index.js for handling form submission -->
 <script src="./index.js"></script>
+<script src="./search.js"></script>
 </body>
 </html>
