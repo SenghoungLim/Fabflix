@@ -14,6 +14,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 @WebServlet(name = "MovieListServlet", urlPatterns = "/api/movie-list")
 public class MovieListServlet extends HttpServlet {
@@ -35,35 +36,35 @@ public class MovieListServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         try (Connection conn = dataSource.getConnection()) {
-            // Define the SQL query to retrieve a list of movies with associated data.
-            String query = "WITH TopRatings AS (\n" +
-                            "    SELECT movieId, MAX(rating) AS max_rating\n" +
-                            "    FROM ratings\n" +
-                            "    GROUP BY movieId\n" +
-                            "    ORDER BY max_rating DESC\n" +
-                            "    LIMIT 20\n" +
-                            ")\n" +
-                            "\n" +
-                            "SELECT\n" +
-                            "    m.id,\n" +
-                            "    m.title,\n" +
-                            "    m.year,\n" +
-                            "    m.director,\n" +
-                            "    SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT g.name SEPARATOR ', '), ', ', 3) AS genres,\n" +
-                            "    SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.id SEPARATOR ', '), ', ', 3)  AS star_ids,\n" +
-                            "    SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.name SEPARATOR ', '), ', ', 3)  AS stars,\n" +
-                            "    tr.max_rating AS rating\n" +
-                            "FROM movies m\n" +
-                            "JOIN TopRatings tr ON m.id = tr.movieId\n" +
-                            "LEFT JOIN genres_in_movies gm ON m.id = gm.movieId\n" +
-                            "LEFT JOIN genres g ON gm.genreId = g.id\n" +
-                            "LEFT JOIN stars_in_movies sm ON m.id = sm.movieId\n" +
-                            "LEFT JOIN stars s ON sm.starId = s.id\n" +
-                            "GROUP BY m.id, m.title, m.year, m.director\n" +
-                            "ORDER BY rating DESC;\n";
+            // Define the SQL query using PreparedStatement to prevent SQL injection and StringBuilder for query construction.
+            StringBuilder queryBuilder = new StringBuilder();
+            queryBuilder.append("WITH TopRatings AS (");
+            queryBuilder.append("    SELECT movieId, MAX(rating) AS max_rating");
+            queryBuilder.append("    FROM ratings");
+            queryBuilder.append("    GROUP BY movieId");
+            queryBuilder.append("    ORDER BY max_rating DESC");
+            queryBuilder.append("    LIMIT 20");
+            queryBuilder.append(")");
+            queryBuilder.append("SELECT");
+            queryBuilder.append("    m.id,");
+            queryBuilder.append("    m.title,");
+            queryBuilder.append("    m.year,");
+            queryBuilder.append("    m.director,");
+            queryBuilder.append("    SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT g.name SEPARATOR ', '), ', ', 3) AS genres,");
+            queryBuilder.append("    SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.id SEPARATOR ', '), ', ', 3)  AS star_ids,");
+            queryBuilder.append("    SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.name SEPARATOR ', '), ', ', 3)  AS stars,");
+            queryBuilder.append("    tr.max_rating AS rating");
+            queryBuilder.append("FROM movies m");
+            queryBuilder.append("JOIN TopRatings tr ON m.id = tr.movieId");
+            queryBuilder.append("LEFT JOIN genres_in_movies gm ON m.id = gm.movieId");
+            queryBuilder.append("LEFT JOIN genres g ON gm.genreId = g.id");
+            queryBuilder.append("LEFT JOIN stars_in_movies sm ON m.id = sm.movieId");
+            queryBuilder.append("LEFT JOIN stars s ON sm.starId = s.id");
+            queryBuilder.append("GROUP BY m.id, m.title, m.year, m.director");
+            queryBuilder.append("ORDER BY rating DESC");
 
-            // Prepare and execute the SQL query.
-            PreparedStatement statement = conn.prepareStatement(query);
+            // Prepare and execute the SQL query using PreparedStatement.
+            PreparedStatement statement = conn.prepareStatement(queryBuilder.toString());
             ResultSet rs = statement.executeQuery();
             JsonArray jsonArray = new JsonArray();
 
@@ -95,10 +96,10 @@ public class MovieListServlet extends HttpServlet {
             statement.close();
 
             // Log the number of results retrieved and send the JSON response to the client.
-            request.getServletContext().log("getting " + jsonArray.size() + " results");
+            request.getServletContext().log("Getting " + jsonArray.size() + " results");
             out.write(jsonArray.toString());
             response.setStatus(200);
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Handle exceptions by sending an error message in the JSON response.
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("errorMessage", e.getMessage());

@@ -12,13 +12,14 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 
 @WebServlet(name = "GenresServlet", urlPatterns = "/api/genres")
 public class GenresServlet extends HttpServlet {
     private static final long serialVersionUID = 7L;
     private DataSource dataSource;
+
     public void init(ServletConfig config) {
         try {
             // Initialize the servlet by looking up the data source from the JNDI context.
@@ -37,21 +38,20 @@ public class GenresServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         try {
-            // Create a new connection to database
+            // Create a new connection to the database
             Connection dbCon = dataSource.getConnection();
 
-            // Declare a new statement
-            Statement statement = dbCon.createStatement();
-
-
-            // Generate a SQL query
+            // Construct the SQL query using PreparedStatement
             String query = "SELECT DISTINCT name FROM genres";
 
             // Log to localhost log
             request.getServletContext().log("query：" + query);
 
+            // Create a PreparedStatement
+            PreparedStatement statement = dbCon.prepareStatement(query);
+
             // Perform the query
-            ResultSet rs = statement.executeQuery(query);
+            ResultSet rs = statement.executeQuery();
 
             // Create a JSON array to store the results.
             JsonArray jsonArray = new JsonArray();
@@ -60,30 +60,34 @@ public class GenresServlet extends HttpServlet {
             while (rs.next()) {
                 String genreName = rs.getString("name");
 
-                // Create a JSON object for each movie and add it to the array.
+                // Create a JSON object for each genre name and add it to the array.
                 JsonObject jsonObject = new JsonObject();
                 jsonObject.addProperty("name", genreName);
 
                 jsonArray.add(jsonObject);
             }
+
             // Close the result set and the prepared statement.
             rs.close();
             statement.close();
 
             // Log the number of results retrieved for debugging purposes.
             request.getServletContext().log("Getting " + jsonArray.size() + " results");
+
             // Write the JSON response to the output stream.
             out.write(jsonArray.toString());
+
             // Set the response status to 200 (OK).
             response.setStatus(200);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // Handle exceptions by sending an error message in the JSON response.
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("errorMessage", e.getMessage());
             out.write(jsonObject.toString());
+
             // Log the error for debugging purposes.
             request.getServletContext().log("Error:", e);
+
             // Set the response status to 500 (Internal Server Error).
             response.setStatus(500);
         } finally {

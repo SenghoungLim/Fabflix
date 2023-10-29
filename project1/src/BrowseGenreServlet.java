@@ -12,8 +12,8 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 
 @WebServlet(name = "BrowseGenreServlet", urlPatterns = "/api/browse-genre")
 public class BrowseGenreServlet extends HttpServlet {
@@ -38,87 +38,76 @@ public class BrowseGenreServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         try {
-            // Create a new connection to database
+            // Create a new connection to the database
             Connection dbCon = dataSource.getConnection();
 
-            // Declare a new statement
-            Statement statement = dbCon.createStatement();
+            // Construct the SQL query using a StringBuilder for query construction.
+            StringBuilder queryBuilder = new StringBuilder();
+            queryBuilder.append("SELECT m.id, m.title, m.year, m.director, ");
+            queryBuilder.append("GROUP_CONCAT(DISTINCT g.name SEPARATOR ', ') AS genres, ");
+            queryBuilder.append("GROUP_CONCAT(DISTINCT s.id SEPARATOR ', ') AS star_ids, ");
+            queryBuilder.append("GROUP_CONCAT(DISTINCT s.name SEPARATOR ', ') AS stars, ");
+            queryBuilder.append("MAX(r.rating) AS rating ");
+            queryBuilder.append("FROM movies m ");
+            queryBuilder.append("LEFT JOIN ratings r ON m.id = r.movieId ");
+            queryBuilder.append("LEFT JOIN genres_in_movies gm ON m.id = gm.movieId ");
+            queryBuilder.append("LEFT JOIN genres g ON gm.genreId = g.id ");
+            queryBuilder.append("LEFT JOIN stars_in_movies sm ON m.id = sm.movieId ");
+            queryBuilder.append("LEFT JOIN stars s ON sm.starId = s.id ");
+            queryBuilder.append("GROUP BY m.id, m.title, m.year, m.director ");
+            queryBuilder.append("HAVING genres LIKE ?");
 
-            // Retrieve parameters
+            // Create a PreparedStatement
+            PreparedStatement statement = dbCon.prepareStatement(queryBuilder.toString());
+
             String genre = request.getParameter("name");
+            statement.setString(1, genre + "%");
 
-            // Generate a SQL query
-            String query =  "SELECT\n" +
-                    "    m.id,\n" +
-                    "    m.title,\n" +
-                    "    m.year,\n" +
-                    "    m.director,\n" +
-                    "    GROUP_CONCAT(DISTINCT g.name SEPARATOR ', ') AS genres,\n" +
-                    "    GROUP_CONCAT(DISTINCT s.id SEPARATOR ', ') AS star_ids,\n" +
-                    "    GROUP_CONCAT(DISTINCT s.name SEPARATOR ', ') AS stars,\n" +
-                    "    MAX(r.rating) AS rating\n" +
-                    "FROM movies m\n" +
-                    "LEFT JOIN ratings r ON m.id = r.movieId\n" +
-                    "LEFT JOIN genres_in_movies gm ON m.id = gm.movieId\n" +
-                    "LEFT JOIN genres g ON gm.genreId = g.id\n" +
-                    "LEFT JOIN stars_in_movies sm ON m.id = sm.movieId\n" +
-                    "LEFT JOIN stars s ON sm.starId = s.id\n";
+            // Log the query to the localhost log
+            request.getServletContext().log("query：" + queryBuilder.toString());
 
-            query += " GROUP BY m.id, m.title, m.year, m.director\n";
-            query += String.format(" HAVING genres LIKE '%s%%'", genre);
-
-
-            // Log to localhost log
-            request.getServletContext().log("query：" + query);
-
-            // Perform the query
-            ResultSet rs = statement.executeQuery(query);
+            // Execute the query
+            ResultSet rs = statement.executeQuery();
 
             // Create a JSON array to store the results.
             JsonArray jsonArray = new JsonArray();
 
             // Iterate through each row in the result set.
             while (rs.next()) {
-                String id = rs.getString("id");
-                String mtitle = rs.getString("title");
-                String myear = rs.getString("year");
-                String mdirector = rs.getString("director");
-                String genres = rs.getString("genres");
-                String star_ids = rs.getString("star_ids");
-                String stars = rs.getString("stars");
-                String rating = rs.getString("rating");
-
-                // Create a JSON object for each movie and add it to the array.
                 JsonObject jsonObject = new JsonObject();
-                jsonObject.addProperty("id", id);
-                jsonObject.addProperty("title", mtitle);
-                jsonObject.addProperty("year", myear);
-                jsonObject.addProperty("director", mdirector);
-                jsonObject.addProperty("genres", genres);
-                jsonObject.addProperty("star_ids", star_ids);
-                jsonObject.addProperty("stars", stars);
-                jsonObject.addProperty("rating", rating);
+                jsonObject.addProperty("id", rs.getString("id"));
+                jsonObject.addProperty("title", rs.getString("title"));
+                jsonObject.addProperty("year", rs.getString("year"));
+                jsonObject.addProperty("director", rs.getString("director"));
+                jsonObject.addProperty("genres", rs.getString("genres"));
+                jsonObject.addProperty("star_ids", rs.getString("star_ids"));
+                jsonObject.addProperty("stars", rs.getString("stars"));
+                jsonObject.addProperty("rating", rs.getString("rating"));
 
                 jsonArray.add(jsonObject);
             }
+
             // Close the result set and the prepared statement.
             rs.close();
             statement.close();
 
             // Log the number of results retrieved for debugging purposes.
             request.getServletContext().log("Getting " + jsonArray.size() + " results");
+
             // Write the JSON response to the output stream.
             out.write(jsonArray.toString());
+
             // Set the response status to 200 (OK).
             response.setStatus(200);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             // Handle exceptions by sending an error message in the JSON response.
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("errorMessage", e.getMessage());
             out.write(jsonObject.toString());
+
             // Log the error for debugging purposes.
             request.getServletContext().log("Error:", e);
+
             // Set the response status to 500 (Internal Server Error).
             response.setStatus(500);
         } finally {
