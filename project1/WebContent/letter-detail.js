@@ -1,29 +1,29 @@
-$(document).ready(function () {
-    // Extract the search results from the URL
-    const searchResults = getParameterByName('results');
-    if (searchResults) {
-        handleResult(JSON.parse(decodeURIComponent(searchResults)));
-    }
-});
-
-// Function to extract query parameters from a URL
+/**
+ * Retrieve parameter from request URL, matching by parameter name
+ * @param target String
+ * @returns {*}
+ */
 function getParameterByName(target) {
+    let url = window.location.href;
     target = target.replace(/[\[\]]/g, "\\$&");
     let regex = new RegExp("[?&]" + target + "(=([^&#]*)|&|#|$)"),
-        results = regex.exec(window.location.href);
+        results = regex.exec(url);
     if (!results) return null;
     if (!results[2]) return '';
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
+/**
+ * Handles the data returned by the API, reads the jsonObject and populates data into HTML elements
+ * @param resultData jsonObject
+ */
 function handleResult(resultData) {
-    console.log("handleMovieResult: populating Search Results");
+    console.log("handleMovieResult: populating letter Results");
 
-    let search_results = jQuery("#search-results");
-    search_results.empty();
+    let letter_results = jQuery("#letter-results");
 
+    letter_results.empty();
 
-    // Iterate through resultData, no more than 20 entries
     for (let i = 0; i < resultData.length; i++) {
         // Concatenate the HTML tags with resultData jsonObject
         let rowHTML = "<tr>";
@@ -49,6 +49,17 @@ function handleResult(resultData) {
         rowHTML += "</tr>";
 
         // Append the row created to the table body
-        search_results.append(rowHTML);
+        letter_results.append(rowHTML);
     }
 }
+
+// Get the movie ID from the URL
+let letter = getParameterByName('letter');
+
+// Make an AJAX request to retrieve movie details
+jQuery.ajax({
+    dataType: "json",
+    method: "GET",
+    url: "api/browse-letter?letter=" + letter,
+    success: (resultData) => handleResult(resultData)
+});
