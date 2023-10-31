@@ -46,36 +46,35 @@ public class SearchServlet extends HttpServlet {
             String starName = request.getParameter("starName");
 
             StringBuilder queryBuilder = new StringBuilder();
-            queryBuilder.append("SELECT\n");
-            queryBuilder.append("    m.id,\n");
-            queryBuilder.append("    m.title,\n");
-            queryBuilder.append("    m.year,\n");
-            queryBuilder.append("    m.director,\n");
-            queryBuilder.append("    GROUP_CONCAT(DISTINCT g.name SEPARATOR ', ') AS genres,\n");
-            queryBuilder.append("    GROUP_CONCAT(DISTINCT s.id SEPARATOR ', ') AS star_ids,\n");
-            queryBuilder.append("    GROUP_CONCAT(DISTINCT s.name SEPARATOR ', ') AS stars,\n");
-            queryBuilder.append("    MAX(r.rating) AS rating\n");
-            queryBuilder.append("FROM movies m\n");
-            queryBuilder.append("LEFT JOIN ratings r ON m.id = r.movieId\n");
-            queryBuilder.append("LEFT JOIN genres_in_movies gm ON m.id = gm.movieId\n");
-            queryBuilder.append("LEFT JOIN genres g ON gm.genreId = g.id\n");
-            queryBuilder.append("LEFT JOIN stars_in_movies sm ON m.id = sm.movieId\n");
-            queryBuilder.append("LEFT JOIN stars s ON sm.starId = s.id\n");
-            queryBuilder.append("WHERE 1 = 1");
+            queryBuilder.append("SELECT m.id, m.title, m.year, m.director, ");
+            queryBuilder.append("SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT g.name ORDER BY g.name ASC SEPARATOR ', '), ',', 3) AS genres, ");
+            queryBuilder.append("SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.id ORDER BY star_movie_count DESC, s.name ASC SEPARATOR ', '), ',', 3) AS star_ids, ");
+            queryBuilder.append("SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.name ORDER BY star_movie_count DESC, s.name ASC SEPARATOR ', '), ',', 3) AS stars, ");
+            queryBuilder.append("MAX(r.rating) AS rating ");
+            queryBuilder.append("FROM movies m ");
+            queryBuilder.append("LEFT JOIN ratings r ON m.id = r.movieId ");
+            queryBuilder.append("LEFT JOIN genres_in_movies gm ON m.id = gm.movieId ");
+            queryBuilder.append("LEFT JOIN genres g ON gm.genreId = g.id ");
+            queryBuilder.append("LEFT JOIN stars_in_movies sm ON m.id = sm.movieId ");
+            queryBuilder.append("LEFT JOIN stars s ON sm.starId = s.id ");
+            queryBuilder.append("LEFT JOIN (");
+            queryBuilder.append("SELECT starId, COUNT(DISTINCT movieId) AS star_movie_count ");
+            queryBuilder.append("FROM stars_in_movies ");
+            queryBuilder.append("GROUP BY starId) star_counts ON s.id = star_counts.starId ");
+            queryBuilder.append("WHERE 1=1 ");
 
-            if (title != null && !title.isEmpty()) {
+            if (!title.isEmpty()) {
                 queryBuilder.append(" AND m.title LIKE ?");
             }
-            if (year != null && !year.isEmpty()) {
+            if (!year.isEmpty()) {
                 queryBuilder.append(" AND m.year = ?");
             }
-            if (director != null && !director.isEmpty()) {
+            if (!director.isEmpty()) {
                 queryBuilder.append(" AND m.director LIKE ?");
             }
-            if (starName != null && !starName.isEmpty()) {
+            if (!starName.isEmpty()) {
                 queryBuilder.append(" AND s.name LIKE ?");
             }
-
             queryBuilder.append(" GROUP BY m.id, m.title, m.year, m.director");
 
             // Log to localhost log
@@ -86,16 +85,16 @@ public class SearchServlet extends HttpServlet {
 
             // Set the parameter values for the placeholders, using '%' for LIKE queries.
             int paramIndex = 1;
-            if (title != null && !title.isEmpty()) {
+            if (!title.isEmpty()) {
                 statement.setString(paramIndex++, "%" + title + "%");
             }
-            if (year != null && !year.isEmpty()) {
+            if (!year.isEmpty()) {
                 statement.setString(paramIndex++, year);
             }
-            if (director != null && !director.isEmpty()) {
+            if (!director.isEmpty()) {
                 statement.setString(paramIndex++, "%" + director + "%");
             }
-            if (starName != null && !starName.isEmpty()) {
+            if (!starName.isEmpty()) {
                 statement.setString(paramIndex, "%" + starName + "%");
             }
 

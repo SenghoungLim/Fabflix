@@ -48,29 +48,40 @@ jQuery.ajax({
     url: "api/movie-list", // Setting request URL, which should return movie data
     success: (resultData) => handleMovieResult(resultData) // Setting a callback function to handle data returned successfully by the MovieListServlet
 });
-
  */
 
 $(document).ready(function () {
     // Add a submit event listener to the search form
     $("#searchForm").submit(function (event) {
-        event.preventDefault(); // Prevent the default form submission
+        // Prevent the default form submission
+        event.preventDefault();
 
         // Get the form data
         const formData = $(this).serialize();
 
-        // Make an AJAX request with the form data
-        $.ajax({
-            dataType: "json",
-            method: "GET",
-            url: "api/form",
-            data: formData,
-            success: function (resultData) {
-                // Redirect to the search results page with the search results as a query parameter
-                window.location = "search.html?results=" + encodeURIComponent(JSON.stringify(resultData));
-            }
-        });
+        // Check if all form fields are empty (no input provided)
+        const allFieldsEmpty = checkIfAllFieldsEmpty(this);
+
+        if (allFieldsEmpty) {
+            // If all fields are empty, show an alert or provide user feedback
+            window.location = "index.html"
+        } else {
+            // If at least one field has input, proceed to the search results
+            window.location = "search.html?" + formData;
+        }
     });
+
+    function checkIfAllFieldsEmpty(form) {
+        // Get all form fields within the specified form
+        const formFields = $(form).find('input[type="text"]');
+
+        // Use Array.prototype.every() to check if all fields are empty
+        const allEmpty = Array.from(formFields).every(function (field) {
+            return field.value.trim() === '';
+        });
+
+        return allEmpty;
+    }
 });
 
 function handleGenres(resultData) {
