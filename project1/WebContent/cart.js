@@ -11,18 +11,20 @@ function displayCartData2(GetResultData) {
         resultData.cart.forEach(function (item, index) {
             //const itemTotal = parseFloat(item.moviePrice) * parseInt(item.quantity);
 
-            totalCartPrice = 9.99 * parseInt(item.quantity)
+            totalCartPrice += parseFloat(item.moviePrice) * parseInt(item.quantity);
+            let buttonContainer =
+                "<div class='button-group'>" +
+                "<button class='increase-button' data-index='" + index + "'>Increase</button>" +
+                "<button class='decrease-button' data-index='" + index + "'>Decrease</button>" +
+                "<button class='delete-button' data-index='" + index + "'>Delete</button>" +
+                "</div>";
 
             let displayString =
-                "Purchased: " + item.movieTitle +
-                " Price: $" + item.moviePrice +
-                " Quantity: <input class='quantity-input' type='number' value='" + item.quantity + "' data-index='" + index + "'>"
-                +
-                "<button class='increase-button' onclick='increaseCartItemQuantity()'>Increase</button>" +
-                "<button class='decrease-button' data-index='" + index + "'>Decrease</button>" +
-                "<button class='delete-button' data-index='" + index + "'>Delete</button>";
+                "Purchased: " + item.movieTitle + "<br>" +
+                "Price: $" + item.moviePrice + "<br>" +
+                "Quantity: <input class='quantity-input' type='number' value='" + item.quantity + "' data-index='" + index + "'>" + "<br>"
 
-            $("#cart-items").append("<p>" + displayString + "</p>");
+                $("#cart-items").append("<p>" + displayString + "</p>" + buttonContainer);
         });
 
         // Display the total cart price
@@ -51,6 +53,17 @@ function displayCartData2(GetResultData) {
             const index = $(this).data("index");
             deleteCartItem(index);
         });
+        $(document).ready(function () {
+            // Handle "Proceed to Payment" button click
+            $("#proceed-to-payment-button").on("click", function () {
+                // Navigate to the payment page with the total cart price as a URL parameter
+                window.location.href = "payment.html?totalPrice=" + totalCartPrice;
+            });
+
+            // Display the total cart price in the payment page
+            // $("#total-cart-price").text("$" + totalCartPrice.toFixed(2));
+        });
+
     } else {
         // Handle the case where the 'cart' is empty or missing
         $("#cart-items").text("Cart is empty");
@@ -76,16 +89,26 @@ const increaseCartItemQuantity = (index) => {
 // Function to decrease item quantity
 const decreaseCartItemQuantity = (index) => {
     const cartItem = resultData.cart[index];
+    console.log("CartItem: " + cartItem)
     if (cartItem.quantity > 1) {
         cartItem.quantity--;
+        displayCartData2(resultData);
+    } else {
+        // Remove the item from the cart
+        deleteCartItem(index);
     }
-    displayCartData2(resultData);
 };
 
 // Function to delete a cart item
+// Function to delete a cart item
 const deleteCartItem = (index) => {
-    resultData.cart.splice(index, 1);
-    displayCartData2(resultData);
+    if (resultData.cart && index >= 0 && index < resultData.cart.length) {
+        if (resultData.cart[index].quantity > 0) {
+            resultData.cart[index].quantity = 0;
+        }
+        resultData.cart.splice(index, 1);
+        displayCartData2(resultData);
+    }
 };
 
 $.ajax("api/cart", {
