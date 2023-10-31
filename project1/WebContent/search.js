@@ -25,7 +25,10 @@ function getParameterByName(target) {
 }
 
 function handleResult(resultData) {
-    console.log("handleMovieResult: populating search Results");
+
+    console.log("handleMovieResult: populating Search Results");
+    console.log(resultData);
+
 
     let search_results = jQuery("#search-results");
 
@@ -64,9 +67,71 @@ function handleResult(resultData) {
         rowHTML += "</td>";
 
         rowHTML += "<td>" + resultData[i]["rating"] + "</td>";
+        rowHTML += "<td><input type='number' class='quantity-input' value='1'></td>";
+        rowHTML += "<td><p>$9.99</p></td>";
+        rowHTML += "<td><button class='add-button' data-movie-id='" + resultData[i]["id"] + "' data-movie-title='" + resultData[i]["title"] + "'>Add</button></td>";
         rowHTML += "</tr>";
 
         // Append the row created to the table body
         search_results.append(rowHTML);
     }
+
+}
+
+
+$(document).on("click", ".add-button", function () {
+    const movieId = $(this).data("movie-id");
+    const movieTitle = $(this).data("movie-title");
+    const moviePrice = 9.99; // Fixed price
+    const quantity = $(this).closest("tr").find(".quantity-input").val();
+    // Send data to the CartServlet using an AJAX request
+    $.ajax("api/cart", {
+        method: "POST",
+        data: {
+            movieId: movieId,
+            movieTitle: movieTitle,
+            moviePrice: moviePrice,
+            quantity: quantity
+        },
+        success: resultDataString => {
+            // Handle the response from the CartServlet
+            // You can update the cart or display a message here
+            let resultDataJson = JSON.parse(resultDataString);
+            displayCartData(resultDataJson);
+            console.log("result send back from servlet" + resultDataJson);
+        }
+    });
+});
+
+
+
+function displayCartData(resultData) {
+    console.log("displayCartData started");
+    console.log(resultData);
+    // Check if the 'cart' property exists and it's an array with at least one item
+    if (Array.isArray(resultData.cart) && resultData.cart.length > 0) {
+        // Access the first item in the 'cart' array
+        let movie = resultData.cart[0];
+        // Create a string to display the movie information
+        let displayString =
+            "Purchased: " + movie.movieTitle +
+            " Price: $" + movie.moviePrice +
+            " Quantity: " + movie.quantity;
+
+        // Update the HTML element with the displayString
+        let displayString2 = "<p> Hello 2 </p>";
+        $("#testItem").append(displayString2);
+        $("#testItem").append(displayString);
+        // $("#testItem2").append(displayString2);
+        // $("#testItem2").append(displayString);
+
+    } else {
+        // Handle the case where the 'cart' is empty or missing
+        $("#testItem").text("Cart is empty");
+    }
+
+    console.log("displayCartData ended");
+}
+
+
 }

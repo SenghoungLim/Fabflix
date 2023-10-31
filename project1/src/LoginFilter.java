@@ -27,7 +27,6 @@ public class LoginFilter implements Filter {
             chain.doFilter(request, response);
             return;
         }
-        System.out.print("Print user name: " + httpRequest.getSession().getAttribute("user"));
         // Redirect to login page if the "user" attribute doesn't exist in session
         if (httpRequest.getSession().getAttribute("user") == null) {
             httpResponse.sendRedirect("login-page.html");

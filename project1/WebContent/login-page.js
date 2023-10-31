@@ -19,7 +19,8 @@ function handleLoginResult(resultDataString) {
         // error messages on <div> with id "login_error_message"
         console.log("show error message");
         console.log(resultDataJson["message"]);
-        $("#login_error_message").text(resultDataJson["message"]);
+        //$("#login_error_message").text(resultDataJson["message"]);
+        alert("Your username or password is incorrect, please try again.");
     }
 }
 
@@ -41,11 +42,13 @@ function submitLoginForm(formSubmitEvent) {
             method: "POST",
             // Serialize the login form to the data sent by POST request
             data: login_form.serialize(),
+            complete: function() {
+                console.log("AJAX request completed");
+            },
             success: handleLoginResult
         }
     );
 }
-
 // Bind the submit action of the form to a handler function
 login_form.submit(submitLoginForm);
 
