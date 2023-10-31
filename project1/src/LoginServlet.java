@@ -15,6 +15,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Enumeration;
+
 import jakarta.servlet.http.HttpSession;
 /**
  * A servlet that takes input from a html <form> and talks to MySQL moviedbexample,
@@ -67,14 +69,21 @@ public class LoginServlet extends HttpServlet {
             // Perform the query
             ResultSet rs = preparedStatement.executeQuery();
             JsonObject responseJsonObject = new JsonObject();
+            //user id to identify user
+            String userId = "";
             // Process the data
             if (rs.next()) {
                 HttpSession session = request.getSession(true);
+                userId = rs.getString("id");
                 session.setAttribute("user", new User(username));
                 session.setAttribute("loggedIn", "true");
+                session.setAttribute("id", userId);
+                System.out.println("user ID," + userId);
+                System.out.println("user email (user): " + session.getAttribute("user"));
+                System.out.println("isLoggedIn: " + session.getAttribute("loggedIn"));
                 responseJsonObject.addProperty("status", "success");
                 responseJsonObject.addProperty("message", "success");
-                response.sendRedirect(request.getContextPath() + "/index.html");
+                //response.sendRedirect(request.getContextPath() + "/index.html");
             }
             else{
                 // Login fail
@@ -88,6 +97,21 @@ public class LoginServlet extends HttpServlet {
                     responseJsonObject.addProperty("message", "incorrect password");
                 }
             }
+
+            //TEST PURPOSE
+//            // Get the HttpSession
+//            HttpSession session = request.getSession();
+//
+//            // Get all attribute names stored in the session
+//            Enumeration<String> attributeNames = session.getAttributeNames();
+//
+//            // Iterate through attribute names and print their values
+//            while (attributeNames.hasMoreElements()) {
+//                String attributeName = attributeNames.nextElement();
+//                Object attributeValue = session.getAttribute(attributeName);
+//                System.out.println("Session Attribute: " + attributeName + " = " + attributeValue);
+//            }
+
             response.getWriter().write(responseJsonObject.toString());
             rs.close();
             statement.close();
