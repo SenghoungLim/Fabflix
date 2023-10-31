@@ -131,7 +131,5 @@ function displayCartData(resultData) {
     }
 
     console.log("displayCartData ended");
-}
-
 
 }
