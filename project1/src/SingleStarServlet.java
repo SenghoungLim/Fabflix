@@ -49,17 +49,18 @@ public class SingleStarServlet extends HttpServlet {
             // Construct a SQL query with parameters represented by "?" using a StringBuilder.
             StringBuilder queryBuilder = new StringBuilder();
             queryBuilder.append("SELECT\n");
-            queryBuilder.append("    s.name AS StarName,\n");
-            queryBuilder.append("    CASE\n");
-            queryBuilder.append("        WHEN s.birthYear IS NOT NULL THEN s.birthYear\n");
-            queryBuilder.append("        ELSE 'N/A'\n");
-            queryBuilder.append("    END AS YearOfBirth,\n");
-            queryBuilder.append("    GROUP_CONCAT(DISTINCT m.title SEPARATOR ', ') AS MovieTitles,\n");
-            queryBuilder.append("    GROUP_CONCAT(DISTINCT m.id SEPARATOR ', ') AS MovieIds\n");
-            queryBuilder.append("FROM stars AS s\n");
-            queryBuilder.append("LEFT JOIN stars_in_movies AS sm ON s.id = sm.starId\n");
-            queryBuilder.append("LEFT JOIN movies AS m ON sm.movieId = m.id\n");
-            queryBuilder.append("WHERE s.id = ?");
+            queryBuilder.append("    s.name AS StarName, ");
+            queryBuilder.append("    CASE ");
+            queryBuilder.append("        WHEN s.birthYear IS NOT NULL THEN s.birthYear ");
+            queryBuilder.append("        ELSE 'N/A' ");
+            queryBuilder.append("    END AS YearOfBirth, ");
+            queryBuilder.append("    GROUP_CONCAT(DISTINCT m.title ORDER BY m.year DESC, m.title ASC SEPARATOR ', ') AS MovieTitles, ");
+            queryBuilder.append("    GROUP_CONCAT(DISTINCT m.id ORDER BY m.year DESC, m.title ASC SEPARATOR ', ') AS MovieIds ");
+            queryBuilder.append("FROM stars AS s ");
+            queryBuilder.append("LEFT JOIN stars_in_movies AS sm ON s.id = sm.starId ");
+            queryBuilder.append("LEFT JOIN movies AS m ON sm.movieId = m.id ");
+            queryBuilder.append("WHERE s.id = ? ");
+            queryBuilder.append("GROUP BY s.name, YearOfBirth ");
 
             // Declare a prepared statement to execute the query.
             PreparedStatement statement = conn.prepareStatement(queryBuilder.toString());

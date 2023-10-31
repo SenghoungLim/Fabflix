@@ -28,7 +28,7 @@ function handleResult(resultData) {
     let title = resultData[0]["title"];
     let year = resultData[0]["year"];
     let director = resultData[0]["director"];
-    let genres = resultData[0]["genres"];
+    let genres = resultData[0]["genres"].split(', ');
     let stars = resultData[0]["stars"].split(', ');
     let starIds = resultData[0]["star_ids"].split(', ');
     let rating = resultData[0]["rating"];
@@ -37,7 +37,16 @@ function handleResult(resultData) {
     let titleRow = '<tr><th>Title:</th><td>' + title + '</td></tr>';
     let yearRow = '<tr><th>Year:</th><td>' + year + '</td></tr>';
     let directorRow = '<tr><th>Director:</th><td>' + director + '</td></tr>';
-    let genresRow = '<tr><th>Genres:</th><td>' + genres + '</td></tr>';
+
+    let genresRow = '<tr><th>Genres:</th><td>';
+    // Create hyperlinks for each star
+    for (let j = 0; j < genres.length; j++) {
+        genresRow += "<a href='genre-detail.html?name=" + genres[j] + "'>" + genres[j] + "</a>";
+        if (j < genres.length - 1) {
+            genresRow += ", ";
+        }
+    }
+    genresRow += '</td></tr>';
 
     let starsRow = '<tr><th>Stars:</th><td>';
     // Create hyperlinks for each star

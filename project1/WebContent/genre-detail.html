@@ -16,6 +16,15 @@
 <div class="container">
   <h1>Fabflix</h1>
 
+  <label for="sortOptions">Sort by:</label>
+  <select id="sortOptions">
+    <option value="ratingTitleASC">Rating, Title, ASC</option>
+    <option value="ratingTitleDESC">Rating, Title, DESC</option>
+    <option value="titleRatingASC">Title, Rating, ASC</option>
+    <option value="titleRatingDESC">Title, Rating, DESC</option>
+  </select>
+  <button id="sortButton">Sort</button>
+
   <h2>Genre Results</h2>
   <table class="table table-striped">
     <thead>
