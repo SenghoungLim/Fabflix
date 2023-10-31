@@ -8,27 +8,51 @@
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <link rel="stylesheet" type="text/css" href="./css/single-movie.css">
 
-  <title>Single Movie</title>
+  <title>Genre Results</title>
 </head>
 <body>
 <nav id="navbar" class="navbar navbar-expand-lg navbar-dark"></nav>
-<div class="container sm">
-  <h1>Single Movie</h1>
+<div class="container">
+  <h1>Fabflix</h1>
+
+  <label for="sortOptions">Sort by:</label>
+  <select id="sortOptions">
+    <option value="ratingTitleASC">Rating, Title, ASC</option>
+    <option value="ratingTitleDESC">Rating, Title, DESC</option>
+    <option value="titleRatingASC">Title, Rating, ASC</option>
+    <option value="titleRatingDESC">Title, Rating, DESC</option>
+  </select>
+  <button id="sortButton">Sort</button>
+
+  <h2>Genre Results</h2>
   <table class="table table-striped">
-    <tbody id="movie_table">
-    <!-- Data will be populated here using JavaScript -->
+    <thead>
+    <tr>
+      <th>Title</th>
+      <th>Year</th>
+      <th>Director</th>
+      <th>Genres</th>
+      <th>Stars</th>
+      <th>Rating</th>
+    </tr>
+    </thead>
+    <tbody id="genre-results">
+    <!-- Search results will be displayed here -->
     </tbody>
   </table>
+
+  <!-- Pagination controls -->
+  <ul id="pagination">
+    <!-- Pagination links will be added here by JavaScript -->
+  </ul>
 </div>
 
 <!-- Load jQuery and Bootstrap JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-<script src="./single-movie.js"></script>
-<!-- Include the Bootstrap navbar -->
+<script src="./genre-detail.js"></script>
 <script>
   $(function() {
     $('#navbar').load('navbar.html');

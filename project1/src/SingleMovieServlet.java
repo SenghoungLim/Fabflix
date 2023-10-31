@@ -43,25 +43,27 @@ public class SingleMovieServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         try (Connection conn = dataSource.getConnection()) {
-            // Construct a SQL query with parameters represented by "?".
-            String query = "SELECT\n" +
-                            "    m.title,\n" +
-                            "    m.year,\n" +
-                            "    m.director,\n" +
-                            "    GROUP_CONCAT(DISTINCT g.name SEPARATOR ', ') AS genres,\n" +
-                            "    GROUP_CONCAT(DISTINCT s.id SEPARATOR ', ') AS star_ids,\n" +
-                            "    GROUP_CONCAT(DISTINCT s.name SEPARATOR ', ') AS stars,\n" +
-                            "    MAX(r.rating) AS rating\n" +
-                            "FROM movies m\n" +
-                            "LEFT JOIN ratings r ON m.id = r.movieId\n" +
-                            "LEFT JOIN genres_in_movies gm ON m.id = gm.movieId\n" +
-                            "LEFT JOIN genres g ON gm.genreId = g.id\n" +
-                            "LEFT JOIN stars_in_movies sm ON m.id = sm.movieId\n" +
-                            "LEFT JOIN stars s ON sm.starId = s.id\n" +
-                            "WHERE m.id = ?";
+            // Construct a SQL query with parameters represented by "?" using a StringBuilder.
+            StringBuilder queryBuilder = new StringBuilder();
+            queryBuilder.append("SELECT m.title, m.year, m.director, ");
+            queryBuilder.append("GROUP_CONCAT(DISTINCT g.name ORDER BY g.name ASC SEPARATOR ', ') AS genres, ");
+            queryBuilder.append("GROUP_CONCAT(DISTINCT s.id ORDER BY star_movie_count DESC, s.name ASC SEPARATOR ', ') AS star_ids, ");
+            queryBuilder.append("GROUP_CONCAT(DISTINCT s.name ORDER BY star_movie_count DESC, s.name ASC SEPARATOR ', ') AS stars, ");
+            queryBuilder.append("MAX(r.rating) AS rating ");
+            queryBuilder.append("FROM movies m ");
+            queryBuilder.append("LEFT JOIN ratings r ON m.id = r.movieId ");
+            queryBuilder.append("LEFT JOIN genres_in_movies gm ON m.id = gm.movieId ");
+            queryBuilder.append("LEFT JOIN genres g ON gm.genreId = g.id ");
+            queryBuilder.append("LEFT JOIN stars_in_movies sm ON m.id = sm.movieId ");
+            queryBuilder.append("LEFT JOIN stars s ON sm.starId = s.id ");
+            queryBuilder.append("LEFT JOIN (");
+            queryBuilder.append("SELECT starId, COUNT(DISTINCT movieId) AS star_movie_count ");
+            queryBuilder.append("FROM stars_in_movies ");
+            queryBuilder.append("GROUP BY starId) star_counts ON s.id = star_counts.starId ");
+            queryBuilder.append("WHERE m.id = ?");
 
             // Declare a prepared statement to execute the query.
-            PreparedStatement statement = conn.prepareStatement(query);
+            PreparedStatement statement = conn.prepareStatement(queryBuilder.toString());
 
             // Set the parameter represented by "?" in the query to the "id" obtained from the URL.
             statement.setString(1, id);
