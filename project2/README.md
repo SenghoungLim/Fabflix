@@ -1,0 +1,15 @@
+# CS122B Project 1
+- [Demo Video Link](https://www.youtube.com/watch?v=IFSWjEaqFoQ)
+### Member Distribution
+  - Both:
+    - Step 1 - 4
+    - Debugging and troubleshooting 
+  - Thien Toan Vu:
+    - Movie list and stars servlets
+    - JavaScript API files
+  - Senghoung Lim
+    - CSS
+    - Partial JavaScript API files 
+    - Submission demo 
+### Special Instruction
+- NA

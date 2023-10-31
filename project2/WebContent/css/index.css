@@ -1,0 +1,37 @@
+body{
+    background: rgb(63,94,251);
+    background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(252,70,107,1) 100%);
+}
+/* Decorate the card size, border and color*/
+.row > div {
+    flex: 1;
+    background: bisque;
+    border: 1px solid grey;
+    border-radius: 1rem;
+    width: 250px;
+    padding: 10px;
+}
+/* Center the title of the movies*/
+.movie-card h5 {
+    text-align: center;
+}
+/* Adjust Space between movie card*/
+.col-sm{
+    margin:20px!important;
+}
+/* CSS for movie cards */
+.movie-card {
+    border: 1px solid #ccc; /* Add a border to the movie cards */
+    padding: 10px;
+    margin: 10px;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Add a subtle box shadow to create a 3D effect */
+
+    /* Add a smooth transition for hover effect */
+    transition: transform 0.8s, box-shadow 0.2s;
+}
+
+/* CSS for the hover effect */
+.movie-card:hover {
+    box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3); /* Increase the box shadow for elevation effect */
+    transform: scale(1.05); /* Slightly move the card up on hover */
+}
