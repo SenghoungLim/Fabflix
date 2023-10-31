@@ -8,7 +8,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 // Declaring a WebServlet called ItemServlet, which maps to url "/items"
-@WebServlet(name = "ItemServlet", urlPatterns = "/items")
+@WebServlet(name = "ItemsServlet", urlPatterns = "/items")
 
 public class ItemsServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {

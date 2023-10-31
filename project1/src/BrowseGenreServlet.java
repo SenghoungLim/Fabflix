@@ -44,9 +44,9 @@ public class BrowseGenreServlet extends HttpServlet {
             // Construct the SQL query using a StringBuilder for query construction.
             StringBuilder queryBuilder = new StringBuilder();
             queryBuilder.append("SELECT m.id, m.title, m.year, m.director, ");
-            queryBuilder.append("GROUP_CONCAT(DISTINCT g.name SEPARATOR ', ') AS genres, ");
-            queryBuilder.append("GROUP_CONCAT(DISTINCT s.id SEPARATOR ', ') AS star_ids, ");
-            queryBuilder.append("GROUP_CONCAT(DISTINCT s.name SEPARATOR ', ') AS stars, ");
+            queryBuilder.append("SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT g.name ORDER BY g.name ASC SEPARATOR ', '), ',', 3) AS genres, ");
+            queryBuilder.append("SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.id ORDER BY star_movie_count DESC, s.name ASC SEPARATOR ', '), ',', 3) AS star_ids, ");
+            queryBuilder.append("SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.name ORDER BY star_movie_count DESC, s.name ASC SEPARATOR ', '), ',', 3) AS stars, ");
             queryBuilder.append("MAX(r.rating) AS rating ");
             queryBuilder.append("FROM movies m ");
             queryBuilder.append("LEFT JOIN ratings r ON m.id = r.movieId ");
@@ -54,14 +54,24 @@ public class BrowseGenreServlet extends HttpServlet {
             queryBuilder.append("LEFT JOIN genres g ON gm.genreId = g.id ");
             queryBuilder.append("LEFT JOIN stars_in_movies sm ON m.id = sm.movieId ");
             queryBuilder.append("LEFT JOIN stars s ON sm.starId = s.id ");
+            queryBuilder.append("LEFT JOIN (");
+            queryBuilder.append("SELECT starId, COUNT(DISTINCT movieId) AS star_movie_count ");
+            queryBuilder.append("FROM stars_in_movies ");
+            queryBuilder.append("GROUP BY starId) star_counts ON s.id = star_counts.starId ");
             queryBuilder.append("GROUP BY m.id, m.title, m.year, m.director ");
             queryBuilder.append("HAVING genres LIKE ?");
+            queryBuilder.append("LIMIT ?, ?"); // Add pagination limit and offset
 
             // Create a PreparedStatement
             PreparedStatement statement = dbCon.prepareStatement(queryBuilder.toString());
 
+            int paramIndex = 1;
             String genre = request.getParameter("name");
-            statement.setString(1, genre + "%");
+            statement.setString(paramIndex++, genre + "%");
+
+            String page = request.getParameter("page");
+            statement.setInt(paramIndex++, (Integer.parseInt(page) - 1) * 15); // Limit
+            statement.setInt(paramIndex, 15); // Offset
 
             // Log the query to the localhost log
             request.getServletContext().log("query：" + queryBuilder.toString());
@@ -69,9 +79,44 @@ public class BrowseGenreServlet extends HttpServlet {
             // Execute the query
             ResultSet rs = statement.executeQuery();
 
+            StringBuilder queryBuilder1 = new StringBuilder();
+            queryBuilder1.append("SELECT COUNT(*) AS totalRows FROM (");
+            queryBuilder1.append("SELECT m.id, m.title, m.year, m.director, ");
+            queryBuilder1.append("SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT g.name ORDER BY g.name ASC SEPARATOR ', '), ',', 3) AS genres, ");
+            queryBuilder1.append("SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.id ORDER BY star_movie_count DESC, s.name ASC SEPARATOR ', '), ',', 3) AS star_ids, ");
+            queryBuilder1.append("SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.name ORDER BY star_movie_count DESC, s.name ASC SEPARATOR ', '), ',', 3) AS stars, ");
+            queryBuilder1.append("MAX(r.rating) AS rating ");
+            queryBuilder1.append("FROM movies m ");
+            queryBuilder1.append("LEFT JOIN ratings r ON m.id = r.movieId ");
+            queryBuilder1.append("LEFT JOIN genres_in_movies gm ON m.id = gm.movieId ");
+            queryBuilder1.append("LEFT JOIN genres g ON gm.genreId = g.id ");
+            queryBuilder1.append("LEFT JOIN stars_in_movies sm ON m.id = sm.movieId ");
+            queryBuilder1.append("LEFT JOIN stars s ON sm.starId = s.id ");
+            queryBuilder1.append("LEFT JOIN (");
+            queryBuilder1.append("SELECT starId, COUNT(DISTINCT movieId) AS star_movie_count ");
+            queryBuilder1.append("FROM stars_in_movies ");
+            queryBuilder1.append("GROUP BY starId) star_counts ON s.id = star_counts.starId ");
+            queryBuilder1.append("GROUP BY m.id, m.title, m.year, m.director ");
+            queryBuilder1.append("HAVING genres LIKE ?");
+            queryBuilder1.append(") AS subquery");
+
+            // Create a PreparedStatement
+            PreparedStatement statement1 = dbCon.prepareStatement(queryBuilder1.toString());
+            statement1.setString(1, genre + "%");
+
+            // Log the query to the localhost log
+            request.getServletContext().log("query1：" + queryBuilder1.toString());
+            ResultSet rs1 = statement1.executeQuery();
+
+
             // Create a JSON array to store the results.
             JsonArray jsonArray = new JsonArray();
 
+            int totalRows = 0;  // Initialize totalRows variable
+            // Move the cursor to the first row of rs1 (there should be only one row)
+            if (rs1.next()) {
+                totalRows = rs1.getInt("totalRows");
+            }
             // Iterate through each row in the result set.
             while (rs.next()) {
                 JsonObject jsonObject = new JsonObject();
@@ -83,6 +128,7 @@ public class BrowseGenreServlet extends HttpServlet {
                 jsonObject.addProperty("star_ids", rs.getString("star_ids"));
                 jsonObject.addProperty("stars", rs.getString("stars"));
                 jsonObject.addProperty("rating", rs.getString("rating"));
+                jsonObject.addProperty("totalRows", totalRows);
 
                 jsonArray.add(jsonObject);
             }
