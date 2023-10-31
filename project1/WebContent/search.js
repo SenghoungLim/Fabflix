@@ -1,10 +1,45 @@
-$(document).ready(function () {
-    const movieTitle = getParameterByName('title');
-    const year = getParameterByName('year');
-    const director = getParameterByName('director');
-    const starName = getParameterByName('starName');
+const movieTitle = getParameterByName('title');
+const year = getParameterByName('year');
+const director = getParameterByName('director');
+const starName = getParameterByName('starName');
+let currentPage = parseInt(getParameterByName('page')) || 1;
+let moviePerPage = 25;
 
-    const apiUrl = `api/form?title=${movieTitle}&year=${year}&director=${director}&starName=${starName}`;
+$(document).ready(function () {
+    const apiUrl = `api/form?title=${movieTitle}&year=${year}&director=${director}&starName=${starName}&page=${currentPage}`;
+
+    // Make an AJAX request with the form data
+    $.ajax({
+        dataType: "json",
+        method: "GET",
+        url: apiUrl,
+        success: (resultData) => handleResult(resultData) // Setting a callback function to handle data returned successfully by the MovieListServlet
+    });
+});
+
+document.getElementById("sortButton").addEventListener("click", function () {
+    var selectedOption = document.getElementById("sortOptions").value;
+
+    // Define your sorting logic here based on the selectedOption
+    let sortField = null;
+    let sortOrder = null;
+
+    console.log(selectedOption)
+
+    if (selectedOption === "ratingTitleASC") {
+        sortField = "Rating";
+        sortOrder = "ASC";
+    } else if (selectedOption === "ratingTitleDESC") {
+        sortField = "Rating";
+        sortOrder = "DESC";
+    } else if (selectedOption === "titleRatingASC") {
+        sortField = "Title";
+        sortOrder = "ASC";
+    } else if (selectedOption === "titleRatingsDESC") {
+        sortField = "Title";
+        sortOrder = "DESC";
+    }
+    const apiUrl = `api/form?title=${movieTitle}&year=${year}&director=${director}&starName=${starName}&page=${currentPage}&sortField=${sortField}&sortOrder=${sortOrder}`;
 
     // Make an AJAX request with the form data
     $.ajax({
@@ -74,8 +109,35 @@ function handleResult(resultData) {
 
         // Append the row created to the table body
         search_results.append(rowHTML);
+        // Update pagination controls
+        updatePagination(resultData);
+    }
+}
+
+/**
+ * Update the pagination controls
+ * @param resultData jsonObject
+ */
+function updatePagination(resultData) {
+    let totalPages = Math.ceil(parseInt(resultData[0]["totalRows"]) / moviePerPage); // Assuming 15 items per page
+
+    let pagination = jQuery("#pagination");
+    pagination.empty();
+
+    if (currentPage > 1) {
+        pagination.append(
+            `<li class="page-item"><a class="page-link" href="search.html?title=${movieTitle}&year=${year}&director=${director}&starName=${starName}&page=1">First</a></li>`
+        );
+        pagination.append(
+            `<li class="page-item"><a class="page-link" href="search.html?title=${movieTitle}&year=${year}&director=${director}&starName=${starName}&page=${currentPage - 1}">Previous</a></li>`
+        );
     }
 
+    if (currentPage < totalPages) {
+        pagination.append(
+            `<li class="page-item"><a class="page-link" href="search.html?title=${movieTitle}&year=${year}&director=${director}&starName=${starName}&page=${currentPage + 1}">Next</a></li>`
+        );
+    }
 }
 
 
@@ -131,7 +193,4 @@ function displayCartData(resultData) {
     }
 
     console.log("displayCartData ended");
-}
-
-
 }

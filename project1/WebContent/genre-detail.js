@@ -1,8 +1,44 @@
+
 // Get the movie ID from the URL
 let genreName = getParameterByName('name');
 
 // Retrieve the page number from the URL
 let currentPage = parseInt(getParameterByName('page')) || 1;
+
+let moviePerPage = 25;
+
+document.getElementById("sortButton").addEventListener("click", function () {
+    var selectedOption = document.getElementById("sortOptions").value;
+
+// Define your sorting logic here based on the selectedOption
+    let sortField = null;
+    let sortOrder = null;
+
+    console.log(selectedOption)
+
+    if (selectedOption === "ratingTitleASC") {
+        sortField = "Rating";
+        sortOrder = "ASC";
+    } else if (selectedOption === "ratingTitleDESC") {
+        sortField = "Rating";
+        sortOrder = "DESC";
+    } else if (selectedOption === "titleRatingASC") {
+        sortField = "Title";
+        sortOrder = "ASC";
+    } else if (selectedOption === "titleRatingsDESC") {
+        sortField = "Title";
+        sortOrder = "DESC";
+    }
+
+    const apiUrl = `api/browse-genre?name=${genreName}&page=${currentPage}&sortField=${sortField}&sortOrder=${sortOrder}`;
+    // Make an AJAX request with the form data
+    $.ajax({
+        dataType: "json",
+        method: "GET",
+        url: apiUrl,
+        success: (resultData) => handleResult(resultData) // Setting a callback function to handle data returned successfully by the MovieListServlet
+    });
+});
 
 /**
  * Retrieve parameter from the request URL, matching by parameter name
@@ -37,7 +73,6 @@ function handleResult(resultData) {
         rowHTML += "<td>" + resultData[i]["director"] + "</td>";
 
         let genres = resultData[i]["genres"].split(', ');
-
         rowHTML += "<td>";
         // Create hyperlinks for each star
         for (let j = 0; j < genres.length; j++) {
@@ -76,7 +111,7 @@ function handleResult(resultData) {
  * @param resultData jsonObject
  */
 function updatePagination(resultData) {
-    let totalPages = Math.ceil(parseInt(resultData[0]["totalRows"]) / 15); // Assuming 15 items per page
+    let totalPages = Math.ceil(parseInt(resultData[0]["totalRows"]) / moviePerPage); // Assuming 15 items per page
 
     let pagination = jQuery("#pagination");
     pagination.empty();

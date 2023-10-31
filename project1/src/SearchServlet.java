@@ -38,6 +38,9 @@ public class SearchServlet extends HttpServlet {
         // Get an output stream for writing the response.
         PrintWriter out = response.getWriter();
 
+        String sortField = request.getParameter("sortField");
+        String sortOrder = request.getParameter("sortOrder");
+
         try (Connection dbCon = dataSource.getConnection()) {
             // Generate a SQL query using PreparedStatement to prevent SQL injection.
             String title = request.getParameter("title");
@@ -75,7 +78,20 @@ public class SearchServlet extends HttpServlet {
             if (!starName.isEmpty()) {
                 queryBuilder.append(" AND s.name LIKE ?");
             }
-            queryBuilder.append(" GROUP BY m.id, m.title, m.year, m.director");
+            queryBuilder.append(" GROUP BY m.id, m.title, m.year, m.director ");
+
+            if (sortOrder != null) {
+                if (sortField.equals("Rating") && sortOrder.equals("ASC"))
+                    queryBuilder.append("ORDER BY rating ASC, m.title ASC ");
+                else if (sortField.equals("Rating") && sortOrder.equals("DESC"))
+                    queryBuilder.append("ORDER BY rating DESC, m.title DESC ");
+                else if (sortField.equals("Title") && sortOrder.equals("ASC"))
+                    queryBuilder.append("ORDER BY m.title ASC, rating ASC ");
+                else if (sortField.equals("Title") && sortOrder.equals("DESC"))
+                    queryBuilder.append("ORDER BY m.title DESC, rating DESC ");
+            }
+
+            queryBuilder.append("LIMIT ?, ?"); // Add pagination limit and offset
 
             // Log to localhost log
             request.getServletContext().log("query: " + queryBuilder.toString());
@@ -95,14 +111,81 @@ public class SearchServlet extends HttpServlet {
                 statement.setString(paramIndex++, "%" + director + "%");
             }
             if (!starName.isEmpty()) {
-                statement.setString(paramIndex, "%" + starName + "%");
+                statement.setString(paramIndex++, "%" + starName + "%");
             }
+
+            int moviePerPage = 25;
+            String page = request.getParameter("page");
+            statement.setInt(paramIndex++, (Integer.parseInt(page) - 1) * moviePerPage); // Limit
+            statement.setInt(paramIndex, moviePerPage); // Offset
 
             // Perform the query
             ResultSet rs = statement.executeQuery();
+            StringBuilder queryBuilder1 = new StringBuilder();
+            queryBuilder1.append("SELECT COUNT(*) AS totalRows FROM (");
+            queryBuilder1.append("SELECT m.id, m.title, m.year, m.director, ");
+            queryBuilder1.append("SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT g.name ORDER BY g.name ASC SEPARATOR ', '), ',', 3) AS genres, ");
+            queryBuilder1.append("SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.id ORDER BY star_movie_count DESC, s.name ASC SEPARATOR ', '), ',', 3) AS star_ids, ");
+            queryBuilder1.append("SUBSTRING_INDEX(GROUP_CONCAT(DISTINCT s.name ORDER BY star_movie_count DESC, s.name ASC SEPARATOR ', '), ',', 3) AS stars, ");
+            queryBuilder1.append("MAX(r.rating) AS rating ");
+            queryBuilder1.append("FROM movies m ");
+            queryBuilder1.append("LEFT JOIN ratings r ON m.id = r.movieId ");
+            queryBuilder1.append("LEFT JOIN genres_in_movies gm ON m.id = gm.movieId ");
+            queryBuilder1.append("LEFT JOIN genres g ON gm.genreId = g.id ");
+            queryBuilder1.append("LEFT JOIN stars_in_movies sm ON m.id = sm.movieId ");
+            queryBuilder1.append("LEFT JOIN stars s ON sm.starId = s.id ");
+            queryBuilder1.append("LEFT JOIN (");
+            queryBuilder1.append("SELECT starId, COUNT(DISTINCT movieId) AS star_movie_count ");
+            queryBuilder1.append("FROM stars_in_movies ");
+            queryBuilder1.append("GROUP BY starId) star_counts ON s.id = star_counts.starId ");
+            queryBuilder1.append("WHERE 1=1 ");
+
+            if (!title.isEmpty()) {
+                queryBuilder1.append(" AND m.title LIKE ?");
+            }
+            if (!year.isEmpty()) {
+                queryBuilder1.append(" AND m.year = ?");
+            }
+            if (!director.isEmpty()) {
+                queryBuilder1.append(" AND m.director LIKE ?");
+            }
+            if (!starName.isEmpty()) {
+                queryBuilder1.append(" AND s.name LIKE ?");
+            }
+            queryBuilder1.append(" GROUP BY m.id, m.title, m.year, m.director ");
+
+            queryBuilder1.append(") AS subquery");
+
+            // Create a PreparedStatement
+            PreparedStatement statement1 = dbCon.prepareStatement(queryBuilder1.toString());
+
+            // Set the parameter values for the placeholders, using '%' for LIKE queries.
+            int paramIndex1 = 1;
+            if (!title.isEmpty()) {
+                statement1.setString(paramIndex1++, "%" + title + "%");
+            }
+            if (!year.isEmpty()) {
+                statement1.setString(paramIndex1++, year);
+            }
+            if (!director.isEmpty()) {
+                statement1.setString(paramIndex1++, "%" + director + "%");
+            }
+            if (!starName.isEmpty()) {
+                statement1.setString(paramIndex1, "%" + starName + "%");
+            }
+
+            // Log the query to the localhost log
+            request.getServletContext().log("query1：" + queryBuilder1.toString());
+            ResultSet rs1 = statement1.executeQuery();
 
             // Create a JSON array to store the results.
             JsonArray jsonArray = new JsonArray();
+
+            int totalRows = 0;  // Initialize totalRows variable
+            // Move the cursor to the first row of rs1 (there should be only one row)
+            if (rs1.next()) {
+                totalRows = rs1.getInt("totalRows");
+            }
 
             // Iterate through each row in the result set.
             while (rs.next()) {
@@ -125,6 +208,8 @@ public class SearchServlet extends HttpServlet {
                 jsonObject.addProperty("star_ids", star_ids);
                 jsonObject.addProperty("stars", stars);
                 jsonObject.addProperty("rating", rating);
+                jsonObject.addProperty("totalRows", totalRows);
+
 
                 jsonArray.add(jsonObject);
             }

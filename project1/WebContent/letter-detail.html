@@ -17,7 +17,16 @@
   <h1>Fabflix</h1>
   <a href="index.html" class="btn btn-primary">Home</a> <!-- Home button -->
 
-  <h2>Genre Results</h2>
+  <label for="sortOptions">Sort by:</label>
+  <select id="sortOptions">
+    <option value="ratingTitleASC">Rating, Title, ASC</option>
+    <option value="ratingTitleDESC">Rating, Title, DESC</option>
+    <option value="titleRatingASC">Title, Rating, ASC</option>
+    <option value="titleRatingDESC">Title, Rating, DESC</option>
+  </select>
+  <button id="sortButton">Sort</button>
+
+  <h2>Letter Results</h2>
   <table class="table table-striped">
     <thead>
     <tr>
@@ -33,6 +42,11 @@
     <!-- Search results will be displayed here -->
     </tbody>
   </table>
+
+  <!-- Pagination controls -->
+  <ul id="pagination">
+    <!-- Pagination links will be added here by JavaScript -->
+  </ul>
 </div>
 
 <!-- Load jQuery and Bootstrap JS -->

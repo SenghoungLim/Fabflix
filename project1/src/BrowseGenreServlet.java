@@ -37,6 +37,9 @@ public class BrowseGenreServlet extends HttpServlet {
         // Get an output stream for writing the response.
         PrintWriter out = response.getWriter();
 
+        String sortField = request.getParameter("sortField");
+        String sortOrder = request.getParameter("sortOrder");
+
         try {
             // Create a new connection to the database
             Connection dbCon = dataSource.getConnection();
@@ -60,18 +63,31 @@ public class BrowseGenreServlet extends HttpServlet {
             queryBuilder.append("GROUP BY starId) star_counts ON s.id = star_counts.starId ");
             queryBuilder.append("GROUP BY m.id, m.title, m.year, m.director ");
             queryBuilder.append("HAVING genres LIKE ?");
+
+            if (sortOrder != null) {
+                if (sortField.equals("Rating") && sortOrder.equals("ASC"))
+                    queryBuilder.append("ORDER BY rating ASC, m.title ASC ");
+                else if (sortField.equals("Rating") && sortOrder.equals("DESC"))
+                    queryBuilder.append("ORDER BY rating DESC, m.title DESC ");
+                else if (sortField.equals("Title") && sortOrder.equals("ASC"))
+                    queryBuilder.append("ORDER BY m.title ASC, rating ASC ");
+                else if (sortField.equals("Title") && sortOrder.equals("DESC"))
+                    queryBuilder.append("ORDER BY m.title DESC, rating DESC ");
+            }
+
             queryBuilder.append("LIMIT ?, ?"); // Add pagination limit and offset
 
             // Create a PreparedStatement
             PreparedStatement statement = dbCon.prepareStatement(queryBuilder.toString());
 
             int paramIndex = 1;
+            int moviePerPage = 25;
             String genre = request.getParameter("name");
             statement.setString(paramIndex++, genre + "%");
 
             String page = request.getParameter("page");
-            statement.setInt(paramIndex++, (Integer.parseInt(page) - 1) * 15); // Limit
-            statement.setInt(paramIndex, 15); // Offset
+            statement.setInt(paramIndex++, (Integer.parseInt(page) - 1) * moviePerPage); // Limit
+            statement.setInt(paramIndex, moviePerPage); // Offset
 
             // Log the query to the localhost log
             request.getServletContext().log("query：" + queryBuilder.toString());
