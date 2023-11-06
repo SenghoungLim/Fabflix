@@ -11,11 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.Enumeration;
+import java.sql.*;
 
 import jakarta.servlet.http.HttpSession;
 /**
@@ -42,13 +38,26 @@ public class LoginServlet extends HttpServlet {
             throws IOException {
 
         response.setContentType("text/html");    // Response mime type
-
+        JsonObject responseJsonObject = new JsonObject();
         // Output stream to STDOUT
         PrintWriter out = response.getWriter();
         System.out.println("LoginServlet Started");
 
-        try {
+        String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
+        System.out.println("gRecaptchaResponse=" + gRecaptchaResponse);
 
+        // Verify reCAPTCHA
+        try {
+            RecaptchaVerifyUtils.verify(gRecaptchaResponse);
+            System.out.println("reCAPTCHA Verification Success" );
+
+        } catch (Exception e) {
+            responseJsonObject.addProperty("status", "fail");
+            response.getWriter().write(responseJsonObject.toString());
+            out.close();
+            return;
+        }
+        try {
             // Create a new connection to database
             Connection dbCon = dataSource.getConnection();
 
@@ -68,7 +77,6 @@ public class LoginServlet extends HttpServlet {
 
             // Perform the query
             ResultSet rs = preparedStatement.executeQuery();
-            JsonObject responseJsonObject = new JsonObject();
             //user id to identify user
             String userId = "";
             // Process the data
@@ -83,7 +91,6 @@ public class LoginServlet extends HttpServlet {
                 System.out.println("isLoggedIn: " + session.getAttribute("loggedIn"));
                 responseJsonObject.addProperty("status", "success");
                 responseJsonObject.addProperty("message", "success");
-                //response.sendRedirect(request.getContextPath() + "/index.html");
             }
             else{
                 // Login fail
@@ -97,20 +104,6 @@ public class LoginServlet extends HttpServlet {
                     responseJsonObject.addProperty("message", "incorrect password");
                 }
             }
-
-            //TEST PURPOSE
-//            // Get the HttpSession
-//            HttpSession session = request.getSession();
-//
-//            // Get all attribute names stored in the session
-//            Enumeration<String> attributeNames = session.getAttributeNames();
-//
-//            // Iterate through attribute names and print their values
-//            while (attributeNames.hasMoreElements()) {
-//                String attributeName = attributeNames.nextElement();
-//                Object attributeValue = session.getAttribute(attributeName);
-//                System.out.println("Session Attribute: " + attributeName + " = " + attributeValue);
-//            }
 
             response.getWriter().write(responseJsonObject.toString());
             rs.close();
@@ -136,3 +129,4 @@ public class LoginServlet extends HttpServlet {
         out.close();
     }
 }
+

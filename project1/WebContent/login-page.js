@@ -20,7 +20,7 @@ function handleLoginResult(resultDataString) {
         console.log("show error message");
         console.log(resultDataJson["message"]);
         //$("#login_error_message").text(resultDataJson["message"]);
-        alert("Your username or password is incorrect, please try again.");
+        alert("Your username or password is incorrect or you have not verify with recaptcha, please try again.");
     }
 }
 

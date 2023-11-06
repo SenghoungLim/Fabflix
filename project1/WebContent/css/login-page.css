@@ -47,3 +47,11 @@ input[type="password"] {
 #submitBtn:hover {
     background-color: #0056b3;
 }
+
+.g-recaptcha{
+    margin-top: 1rem;
+    margin-left: -0.3rem;
+    align-items: center;
+    transform:scale(0.9);
+    transform-origin:0 0;
+}
