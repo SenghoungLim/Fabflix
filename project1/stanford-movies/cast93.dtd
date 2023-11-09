@@ -1,0 +1,52 @@
+<!Doctype html public "-//W3O//DTD/ W3 HTML 2.0//EN">
+<!- The XML DTD schema for the CASTS.xml files Movies Database -- >
+
+<!-  -- CASTS -- This is a large file of who acted as what in which movie.
+<!-	About 50 000 entries, only partial for movies and roletypes, July 1999).
+<!- Casts is an association relation, linking actors with movies.  -->
+<!- The key of the relation is the catenation of the two fields  "film_id" and "actor";-->
+<!-  no temporal information is included in this relation.  --> 
+
+<!- The  CAST file is broken up into sections by initial letter(s) of the directors identifying code. -->
+<!- In each section will be a number of directors, ordered by code. There is a distinct table for each director. -->
+<!-  Each director table has two types of entries -->
+<!-  Comment+:  one header record giving the director's id, name, and format information. -->
+<!-  Comment+:  multiple records for each movie and listed actor.  There are no headers for distinct movies. -->
+<!ELEMENT casts (dirfilms*)  	
+<!ELEMENT dirfilms (dirid, is, castnote, filmc+)  			<!-entry for all casts for all movies of one director -->
+	<!ELEMENT dirid >   				<!- unique id for the director -->
+	<!ELEMENT is >   				<!- standardized name for the director, defined in people -->
+	<!ELEMENT castnote >   				<!- notes about these casts  -->
+	<!ELEMENT filmc (m*)>   			<!- one particular film -->
+<!ELEMENT m (f, t, a, p, r, rname, rolespecs?, awards?, life?, xref?, notes?, error? )	
+<!-  Comment:   Entry for a cast member  -->
+<!ELEMENT f >			<!-  Comment:   Identifier of the film. Reference to Main. --> 
+<!ELEMENT t >                            <!- Comment:   Title of the movie, redundant, also listed in MAIN. --> 
+<!ELEMENT a >		<!-  Comment:   Name of the actor in a role, uses the standardized stagename, for actors listed in ACTORS.  If unknown, but role is important, then `sa' is used for `some actor'. . --> 
+<!ELEMENT p>  		<!- Comment:   Type of the role, encoded by a ROLE-TYPE. 
+\Und means unassigned. . --> 
+<!ELEMENT r >			<!- Comment:   short description of the role played in the film. -->
+<!ELEMENT rname 	>	<!- Comment:  Name for character in movie. -->
+<!ELEMENT rolespecs (rolebase?, rolenumber:?, episode?, sings?>	
+<!-Comment+:  Name for character in real-world basis of film. -->
+     				<!ELEMENT rbase >	<!- Comment:   Name for character in real-world basis of film. -->
+    				<!ELEMENT rnumber > 	<!- Comment:   Number when multiple roles are played in  film. -->
+     				<!ELEMENT episode >	<!-  Comment:  Used for movies with multiple distinct episodes. -->
+     				<!ELEMENT sings >	<!-  Comment:  Used for memorable songs. -->
+<!ELEMENT awards(award+) >	<!-  Comment:  Awards given to this actor for this role.   --> 
+       				<!ELEMENT award >	<!-  Comment:  Award type.. --> 
+<!ELEMENT life	(debut?, last?, lifenote?)	<!-  Comment:   Infor. about star's movie life. -->
+       				<!ELEMENT debut >	<!-  Comment:   Used for first performance of well-known stars. -->
+       				<!ELEMENT last >	<!-  Comment:   Used for last performance of well-known stars. -->
+		<!ELEMENT fno >	<!-  Comment:   Film number for well-known stars. -->
+      				<!ELEMENT lifenote >	<!-  Comment:   Used for observation of life of stars. -->
+<!ELEMENT xref (kref, refname)	<!-  Comment:   cross reference, to be completed. -->
+         				<!ELEMENT kref >  	<!-  Comment:   cross reference destination. -->
+         				<!ELEMENT refname >  	<!-  Comment:   cross reference destination, to be completed. -->
+<!ELEMENT notes (facts?)	<!-  Comment:   Used for exceptional events in the performance. -->
+<!ELEMENT facts >        <!-  Comment:   Exceptional fact, as `Garbo laughs'. -->
+<!ELEMENT error >		<!-  Comment:   To be investigated. -->
+
+
+
+
