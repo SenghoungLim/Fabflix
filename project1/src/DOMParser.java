@@ -242,10 +242,4 @@ public class DOMParser {
     public Map<String, String> getStarInMovieDict() {return starInMovieDict;}
 
     public Map<String, String> getGenresInMovieDict() {return genresInMovieDict;}
-
-    /*
-    public static void main(String[] args) {
-        DOMParser DOMParser = new DOMParser();
-    }
-    */
 }
