@@ -71,29 +71,43 @@ function handleResult(resultData) {
         rowHTML += "<td>" + resultData[i]["year"] + "</td>";
         rowHTML += "<td>" + resultData[i]["director"] + "</td>";
 
-        let genres = resultData[i]["genres"].split(', ');
-        rowHTML += "<td>";
-        // Create hyperlinks for each star
-        for (let j = 0; j < genres.length; j++) {
-            rowHTML += "<a href='genre-detail.html?name=" + genres[j] + "'>" + genres[j] + "</a>";
-            if (j < genres.length - 1) {
-                rowHTML += ", ";
+        let genres = resultData[i]["genres"];
+        if (genres != null){
+            genres = genres.split(', ');
+            rowHTML += "<td>";
+            // Create hyperlinks for each star
+            for (let j = 0; j < genres.length; j++) {
+                rowHTML += "<a href='genre-detail.html?name=" + genres[j] + "'>" + genres[j] + "</a>";
+                if (j < genres.length - 1) {
+                    rowHTML += ", ";
+                }
             }
+            rowHTML += "</td>";
         }
-        rowHTML += "</td>";
+        else{
+            rowHTML += "<td>" + genres + "</td>";
+        }
 
-        let stars = resultData[i]["stars"].split(', ');
-        let starIds = resultData[i]["star_ids"].split(', ');
+        let stars = resultData[i]["stars"];
+        let starIds = resultData[i]["star_ids"];
 
-        rowHTML += "<td>";
-        // Create hyperlinks for each star
-        for (let j = 0; j < stars.length; j++) {
-            rowHTML += "<a href='single-star.html?id=" + starIds[j] + "'>" + stars[j] + "</a>";
-            if (j < stars.length - 1) {
-                rowHTML += ", ";
+        if(stars != null && starIds != null) {
+            stars = stars.split(', ');
+            starIds = starIds.split(', ');
+
+            rowHTML += "<td>";
+            // Create hyperlinks for each star
+            for (let j = 0; j < stars.length; j++) {
+                rowHTML += "<a href='single-star.html?id=" + starIds[j] + "'>" + stars[j] + "</a>";
+                if (j < stars.length - 1) {
+                    rowHTML += ", ";
+                }
             }
+            rowHTML += "</td>";
         }
-        rowHTML += "</td>";
+        else{
+            rowHTML += "<td>" + stars + "</td>";
+        }
 
         rowHTML += "<td>" + resultData[i]["rating"] + "</td>";
         rowHTML += "</tr>";
