@@ -116,12 +116,15 @@ public class DOMParser {
             if (genreText != null && !genreText.isEmpty()) {
                 String[] genres = genreText.split("[\\s\\.]+");
                 for (String genre : genres) {
+                    // Remove non-alphanumeric characters except "-"
+                    genre = genre.replaceAll("[^A-Za-z0-9-]", "");
+
                     genre = genre.trim();
                     if (genre != null && !genre.isEmpty()) {
                         if (!genreDict.containsValue(genre.trim()) && !newGenreDict.containsValue(genre.trim())) {
                             newGenreDict.put(String.valueOf(newGenreCount++), genre);
-                            genresInMovieDict.put(getGenreId(genre), filmId);
                         }
+                        genresInMovieDict.put(getGenreId(genre), filmId);
                     }
                 }
             }
@@ -135,6 +138,11 @@ public class DOMParser {
     // Method to get the genre ID from newGenreDict
     private String getGenreId(String genre) {
         for (Map.Entry<String, String> entry : newGenreDict.entrySet()) {
+            if (entry.getValue().equals(genre)) {
+                return entry.getKey();
+            }
+        }
+        for (Map.Entry<String, String> entry : genreDict.entrySet()) {
             if (entry.getValue().equals(genre)) {
                 return entry.getKey();
             }

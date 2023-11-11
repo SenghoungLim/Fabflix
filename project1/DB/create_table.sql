@@ -1,4 +1,4 @@
-CREATE database moviedb;
+CREATE DATABASE IF NOT EXISTS moviedb;
 USE moviedb;
 CREATE TABLE IF NOT EXISTS movies (
     id VARCHAR(10) PRIMARY KEY,

@@ -1,3 +1,4 @@
+/*
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -15,6 +16,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 
 @WebServlet(name = "MovieListServlet", urlPatterns = "/api/movie-list")
 public class MovieListServlet extends HttpServlet {
@@ -111,3 +113,4 @@ public class MovieListServlet extends HttpServlet {
         }
     }
 }
+ */

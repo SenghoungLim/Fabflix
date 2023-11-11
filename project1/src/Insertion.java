@@ -3,12 +3,11 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class Insertion {
     public static void main(String[] args) {
+        long startTime = System.currentTimeMillis();
+
         try {
             DOMParser domParser = new DOMParser();
             domParser.runMains243();
@@ -28,61 +27,33 @@ public class Insertion {
 
             // Connect to the database
             try (Connection connection = DriverManager.getConnection(loginUrl, loginUser, loginPasswd)) {
+                // Insert movies
+                batchInsertMovies(connection, filmDict);
+                System.out.println("INSERTED INTO movies");
 
-                ExecutorService executor = Executors.newFixedThreadPool(5);
+                // Insert stars
+                batchInsertStars(connection, starDict);
+                System.out.println("INSERTED INTO stars");
 
-                // Submit tasks for each data type
-                executor.submit(() -> {
-                    try {
-                        batchInsertMovies(connection, filmDict);
-                        System.out.println("INSERTED INTO movies");
-                    } catch (SQLException e) {
-                        System.err.println("Error inserting into movies: " + e.getMessage());
-                    }
-                });
+                // Insert genres
+                batchInsertGenres(connection, newGenreDict);
+                System.out.println("INSERTED INTO genres");
 
-                executor.submit(() -> {
-                    try {
-                        batchInsertStars(connection, starDict);
-                        System.out.println("INSERTED INTO stars");
-                    } catch (SQLException e) {
-                        System.err.println("Error inserting into stars: " + e.getMessage());
-                    }
-                });
+                // Insert genres_in_movies
+                batchInsertGenresInMovies(connection, genresInMovieDict);
+                System.out.println("INSERTED INTO genres_in_movies");
 
-                executor.submit(() -> {
-                    try {
-                        batchInsertGenres(connection, newGenreDict);
-                        System.out.println("INSERTED INTO genres");
-                    } catch (SQLException e) {
-                        System.err.println("Error inserting into genres: " + e.getMessage());
-                    }
-                });
+                // Insert stars_in_movies
+                batchInsertStarsInMovies(connection, starInMovieDict);
+                System.out.println("INSERTED INTO stars_in_movies");
 
-                executor.submit(() -> {
-                    try {
-                        batchInsertGenresInMovies(connection, genresInMovieDict);
-                        System.out.println("INSERTED INTO genres_in_movies");
-                    } catch (SQLException e) {
-                        System.err.println("Error inserting into genres_in_movies: " + e.getMessage());
-                    }
-                });
-
-                executor.submit(() -> {
-                    try {
-                        batchInsertStarsInMovies(connection, starInMovieDict);
-                        System.out.println("INSERTED INTO stars_in_movies");
-                    } catch (SQLException e) {
-                        System.err.println("Error inserting into stars_in_movies: " + e.getMessage());
-                    }
-                });
-
-                executor.shutdown();
-                executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-
-            } catch (SQLException | InterruptedException e) {
+            } catch (SQLException e) {
                 System.out.println("Database error: " + e.getMessage());
             }
+
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
+            System.out.println("Total execution time: " + duration + " milliseconds");
 
         } catch (Exception e) {
             System.out.println("An unexpected error occurred: " + e.getMessage());
@@ -98,9 +69,8 @@ public class Insertion {
                 insertMoviesStatement.setString(2, film.getTitle());
                 insertMoviesStatement.setString(3, film.getYear());
                 insertMoviesStatement.setString(4, film.getDirector());
-                insertMoviesStatement.addBatch();
+                insertMoviesStatement.executeUpdate();
             }
-            insertMoviesStatement.executeBatch();
         }
     }
 
@@ -112,9 +82,8 @@ public class Insertion {
                 insertStarsStatement.setString(1, star.getId());
                 insertStarsStatement.setString(2, star.getName());
                 insertStarsStatement.setString(3, star.getDOB());
-                insertStarsStatement.addBatch();
+                insertStarsStatement.executeUpdate();
             }
-            insertStarsStatement.executeBatch();
         }
     }
 
@@ -126,9 +95,8 @@ public class Insertion {
                 String genreName = entry.getValue();
                 insertGenresStatement.setString(1, genreId);
                 insertGenresStatement.setString(2, genreName);
-                insertGenresStatement.addBatch();
+                insertGenresStatement.executeUpdate();
             }
-            insertGenresStatement.executeBatch();
         }
     }
 
@@ -140,9 +108,8 @@ public class Insertion {
                 String movieId = entry.getValue();
                 insertGenresInMoviesStatement.setString(1, genreId);
                 insertGenresInMoviesStatement.setString(2, movieId);
-                insertGenresInMoviesStatement.addBatch();
+                insertGenresInMoviesStatement.executeUpdate();
             }
-            insertGenresInMoviesStatement.executeBatch();
         }
     }
 
@@ -154,9 +121,8 @@ public class Insertion {
                 String movieId = entry.getValue();
                 insertStarsInMoviesStatement.setString(1, starId);
                 insertStarsInMoviesStatement.setString(2, movieId);
-                insertStarsInMoviesStatement.addBatch();
+                insertStarsInMoviesStatement.executeUpdate();
             }
-            insertStarsInMoviesStatement.executeBatch();
         }
     }
 }
