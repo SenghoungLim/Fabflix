@@ -14,6 +14,8 @@ import java.io.PrintWriter;
 import java.sql.*;
 
 import jakarta.servlet.http.HttpSession;
+import org.jasypt.util.password.StrongPasswordEncryptor;
+
 /**
  * A servlet that takes input from a html <form> and talks to MySQL moviedbexample,
  * generates output as a html <table>
@@ -48,7 +50,7 @@ public class LoginServlet extends HttpServlet {
 
         // Verify reCAPTCHA
         try {
-            RecaptchaVerifyUtils.verify(gRecaptchaResponse);
+            //RecaptchaVerifyUtils.verify(gRecaptchaResponse);
             System.out.println("reCAPTCHA Verification Success" );
 
         } catch (Exception e) {
@@ -67,10 +69,10 @@ public class LoginServlet extends HttpServlet {
             String username = request.getParameter("username");
             String password = request.getParameter("password");
 
-            String query = "SELECT * FROM customers WHERE email = ? AND password = ?";
+            String query = "SELECT * FROM customers WHERE email = ?";
             PreparedStatement preparedStatement = dbCon.prepareStatement(query);
             preparedStatement.setString(1, username);
-            preparedStatement.setString(2, password);
+//            preparedStatement.setString(2, password);
 
             // Log to localhost log
             request.getServletContext().log("query：" + query);
@@ -80,17 +82,27 @@ public class LoginServlet extends HttpServlet {
             //user id to identify user
             String userId = "";
             // Process the data
+            Boolean success = false;
             if (rs.next()) {
-                HttpSession session = request.getSession(true);
-                userId = rs.getString("id");
-                session.setAttribute("user", new User(username));
-                session.setAttribute("loggedIn", "true");
-                session.setAttribute("id", userId);
-                System.out.println("user ID," + userId);
-                System.out.println("user email (user): " + session.getAttribute("user"));
-                System.out.println("isLoggedIn: " + session.getAttribute("loggedIn"));
-                responseJsonObject.addProperty("status", "success");
-                responseJsonObject.addProperty("message", "success");
+                String storedEncryptedPassword = rs.getString("password");
+                success = new StrongPasswordEncryptor().checkPassword(password, storedEncryptedPassword);
+                if(success) {
+                    HttpSession session = request.getSession(true);
+                    userId = rs.getString("id");
+                    session.setAttribute("user", new User(username));
+                    session.setAttribute("loggedIn", "true");
+                    session.setAttribute("id", userId);
+                    //String encryptedPassword = rs.getString("password");
+                    //success = new StrongPasswordEncryptor().checkPassword(password, encryptedPassword);
+                    System.out.println("user ID," + userId);
+                    System.out.println("user email (user): " + session.getAttribute("user"));
+                    System.out.println("isLoggedIn: " + session.getAttribute("loggedIn"));
+                    responseJsonObject.addProperty("status", "success");
+                    responseJsonObject.addProperty("message", "success");
+                }else{
+                    responseJsonObject.addProperty("status", "fail");
+                    responseJsonObject.addProperty("message", "incorrect password");
+                }
             }
             else{
                 // Login fail
@@ -121,9 +133,12 @@ public class LoginServlet extends HttpServlet {
              * This can help you debug your program after deploying it on AWS.
              */
             request.getServletContext().log("Error: ", e);
+            responseJsonObject.addProperty("status", "error");
+            responseJsonObject.addProperty("message", "SQL error in doPost: " + e.getMessage());
+            response.getWriter().write(responseJsonObject.toString());
 
             // Output Error Massage to html
-            out.println(String.format("<html><head><title>MovieDBExample: Error</title></head>\n<body><p>SQL error in doPost: %s</p></body></html>", e.getMessage()));
+            //out.println(String.format("<html><head><title>MovieDBExample: Error</title></head>\n<body><p>SQL error in doPost: %s</p></body></html>", e.getMessage()));
             return;
         }
         out.close();

@@ -49,6 +49,9 @@ public class LoginFilter implements Filter {
         allowedURIs.add("login-page.js");
         allowedURIs.add("login-page.css");
         allowedURIs.add("/login");
+        allowedURIs.add("employee-login.html");
+        allowedURIs.add("/_dashboard");
+        allowedURIs.add("employee-login.js");
     }
 
     public void destroy() {

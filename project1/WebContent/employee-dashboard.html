@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>Employee Dashboard</title>
+</head>
+<body>
+<nav id="navbar" class="navbar navbar-expand-lg navbar-dark"></nav>
+<div class="container">
+    <h1>Fabflix Employee Dashboard</h1>
+    <h2>Meta Data</h2>
+    <table class="table" id="metaDataTable">
+        <!-- Table header -->
+        <thead>
+        <tr>
+            <th>Table Name</th>
+            <th>Columns</th>
+        </tr>
+        </thead>
+        <!-- Table body -->
+        <tbody>
+        </tbody>
+    </table>
+    <div class = "addDataToSQL">
+        <h2>Add New Star</h2>
+        <form action = "api/addStar" method="post"  id = "addStarFormId">
+            <label>
+                Star Name:
+                <input name="starNameInput" id = "starNameInput" required/>
+            </label>
+            <label>
+                Birth Year:
+                <input name="birthYearInput" id = "birthYearInput" />
+            </label>
+            <button>Add Star</button>
+        </form>
+        <div class = "displayNewStarData" id = "displayNewStarData"></div>
+
+        <h2>Add New Movie</h2>
+        <form id="addMovieForm">
+            <label>
+                Movie Title:
+                <input name="movieTitleInput" id="movieTitleInput" required/>
+            </label>
+            <label>
+                Year:
+                <input name="movieYearInput" id="movieYearInput" required/>
+            </label>
+            <label>
+                Director:
+                <input name="movieDirectorInput" id="movieDirectorInput" required/>
+            </label>
+            <label>
+                Star Name:
+                <input name="starNameMovieInput" id="starNameMovieInput" required/>
+            </label>
+            <label>
+                Genre Name:
+                <input name="genreNameInput" id="genreNameInput" required/>
+            </label>
+            <button id="addMovieButton">Add Movie</button>
+        </form>
+    </div>
+    <div class="displayNewMovieData" id="displayNewMovieData"></div>
+    </div>
+</div>
+
+
+<!-- Load jQuery and Bootstrap JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src = "./employee-dashboard.js"></script>
+<script>
+    $(function() {
+        $('#navbar').load('navbar.html');
+    });
+</script>
+
+</body>
+</html>
