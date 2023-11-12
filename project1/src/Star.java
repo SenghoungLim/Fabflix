@@ -1,7 +1,7 @@
 public class Star {
     private final String id;
     private final String name;
-    private final String DOB;
+    private String DOB;
     public Star(String id, String name, String DOB) {
         this.id = id;
         this.name = name;
@@ -18,5 +18,9 @@ public class Star {
 
     public String getDOB() {
         return DOB;
+    }
+
+    public void setDOB(String DOB){
+        this.DOB = DOB;
     }
 }

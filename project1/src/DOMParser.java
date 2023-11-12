@@ -66,6 +66,13 @@ public class DOMParser {
         parseCast124(dom);
     }
 
+    public void runActors63() {
+        String actors63 = "stanford-movies/actors63.xml";
+
+        Document dom = parseXmlFile(actors63);
+        parseActors63(dom);
+    }
+
     // Method to parse XML file and return the Document
     private Document parseXmlFile(String url) {
         Document dom = null;
@@ -155,7 +162,8 @@ public class DOMParser {
         String textValue = null;
         NodeList nodeList = element.getElementsByTagName(tagName);
         if (nodeList.getLength() > 0) {
-            textValue = nodeList.item(0).getTextContent();
+            if(!nodeList.item(0).getTextContent().isEmpty())
+                textValue = nodeList.item(0).getTextContent();
         }
         return textValue;
     }
@@ -191,6 +199,46 @@ public class DOMParser {
         Star star = new Star(starId, name, DOB);
         starDict.put(starId, star);
         starInMovieDict.put(starId, movieId);
+    }
+
+    private void parseActors63(Document dom) {
+        Element actorsElement = dom.getDocumentElement();
+        NodeList actorList = actorsElement.getElementsByTagName("actor");
+
+        for (int i = 0; i < actorList.getLength(); i++) {
+            Element actorElement = (Element) actorList.item(i);
+            parseActor(actorElement);
+        }
+    }
+
+    private void parseActor(Element element) {
+        String actorName = getTextValue(element, "stagename");
+        String DOB = getTextValue(element, "dob");
+
+        String starId = actorName.toLowerCase().replaceAll("\\s", "") + (newStarCount++);
+
+        // Check if starDict already contains a star with the same actor name
+        boolean starWithSameNameExists = starDict.values().stream()
+                .anyMatch(star -> actorName.toLowerCase().equals(star.getName().toLowerCase()));
+
+        if (starWithSameNameExists) {
+            // Find the star with the same actor name
+            String existingStarId = starDict.entrySet()
+                    .stream()
+                    .filter(entry -> actorName.toLowerCase().equals(entry.getValue().getName().toLowerCase()))
+                    .map(Map.Entry::getKey)
+                    .findFirst()
+                    .orElse(null);
+
+
+            Star existingStar = starDict.get(existingStarId);
+            existingStar.setDOB(DOB);
+
+        } else {
+            // Create a new star if no existing star with the same actor name
+            Star star = new Star(starId, actorName, DOB);
+            starDict.put(starId, star);
+        }
     }
 
     // Method to print films from mains243.xml
@@ -240,6 +288,15 @@ public class DOMParser {
         }
     }
 
+    private void printActors63() {
+        System.out.println("Actors Dictionary:");
+
+        for (Map.Entry<String, Star> entry : starDict.entrySet()) {
+            Star star = entry.getValue();
+            System.out.println("ID: " + entry.getKey() + ", Name: " + star.getName() + ", DOB: " + star.getDOB());
+        }
+    }
+
     // Getter methods for the dictionaries
     public Map<String, Film> getFilmDict() {return filmDict;}
 
@@ -250,4 +307,10 @@ public class DOMParser {
     public Map<String, String> getStarInMovieDict() {return starInMovieDict;}
 
     public Map<String, String> getGenresInMovieDict() {return genresInMovieDict;}
+
+    /*
+    public static void main(String[] args) {
+        DOMParser domParser = new DOMParser();
+    }
+    */
 }

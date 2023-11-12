@@ -17,6 +17,7 @@ public class ImprovedInsertion {
             DOMParser domParser = new DOMParser();
             domParser.runMains243();
             domParser.runCasts124();
+            domParser.runActors63();
 
             Map<String, Film> filmDict = domParser.getFilmDict();
             Map<String, Star> starDict = domParser.getStarDict();
