@@ -34,11 +34,11 @@ public class DashboardServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         //reCaptCha
         String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
-//        try {
-//            RecaptchaVerifyUtils.verify(gRecaptchaResponse);
-//        } catch(Exception e) {
-//           recaptchaVerifyFailed(responseJsonObj);
-//        }
+        try {
+            RecaptchaVerifyUtils.verify(gRecaptchaResponse);
+        } catch(Exception e) {
+           recaptchaVerifyFailed(responseJsonObj);
+        }
         //Verify username, password with Encryption
         try{
             System.out.println("Try data connection");
