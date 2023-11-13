@@ -2,10 +2,27 @@
 - [Demo Video Link](https://drive.google.com/file/d/1PX6kdB6Y_srcQVtd_DNWvbYwHlsek_b2/view?usp=sharing)
 - if the link above does not work, use this backup instead: https://youtu.be/MJYs5xoLV0Y
 ## Member Distribution
-  - Both:
-    - Everything
+  - Senghoung Lim
+    - Task 1 - 5 & Demo
+  - Thien Toan Vu
+    - Task 6
 ## Special Instruction
 - NA
+
+## List of filenames with Prepared Statements
+All extension is .java
+- AddMovieServlet
+- AddStarServlet
+- BrowseGenreServlet
+- BrowseLetterServlet
+- DashboardServlet
+- GenreServlet
+- ImprovedInsertion
+- Insertion
+- LoginServlet
+- MovieListServlet
+- SearchServlet
+- SingleStarServlet
 
 ## XML Parsing
 - Native Implementation: 34388 milliseconds
