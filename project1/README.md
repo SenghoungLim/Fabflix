@@ -1,5 +1,6 @@
 # CS122B Project 1
 - [Demo Video Link](https://youtu.be/i1Pm3D06-nk?si=GCJwOPtvHI6Wlrxr)
+- [stored_procedure file](https://github.com/uci-jherold2-fall23-cs122b/2023-fall-cs122b-jake/blob/main/project1/DB/stored-procedure.sql)
 ## Member Distribution
   - Senghoung Lim
     - Task 1 - 5 & Demo
