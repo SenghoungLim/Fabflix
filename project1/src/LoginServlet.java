@@ -50,7 +50,7 @@ public class LoginServlet extends HttpServlet {
 
         // Verify reCAPTCHA
         try {
-            //RecaptchaVerifyUtils.verify(gRecaptchaResponse);
+            RecaptchaVerifyUtils.verify(gRecaptchaResponse);
             System.out.println("reCAPTCHA Verification Success" );
 
         } catch (Exception e) {

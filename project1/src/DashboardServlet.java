@@ -34,6 +34,7 @@ public class DashboardServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         //reCaptCha
         String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
+        System.out.println("gRecaptchaResponse:" + gRecaptchaResponse);
         try {
             RecaptchaVerifyUtils.verify(gRecaptchaResponse);
         } catch(Exception e) {
