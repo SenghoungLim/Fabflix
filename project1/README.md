@@ -1,5 +1,5 @@
 # CS122B Project 1
-- [Demo Video Link](https://www.youtube.com/watch?v=MJYs5xoLV0Y)
+- [Demo Video Link](https://youtu.be/i1Pm3D06-nk?si=GCJwOPtvHI6Wlrxr)
 ## Member Distribution
   - Senghoung Lim
     - Task 1 - 5 & Demo
