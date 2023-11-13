@@ -21,6 +21,12 @@ BEGIN
     FROM movies
     WHERE title = p_title AND year = p_year AND director = p_director;
     
+    -- If the movie already exists, raise an exception
+    IF v_movie_id IS NOT NULL THEN
+    	SIGNAL SQLSTATE '45000'
+    	SET MESSAGE_TEXT = 'Duplicate movie entry.';
+    END IF;
+
     -- If the ID is null, assign a random value using UUID
     IF v_movie_id IS NULL THEN
         SET v_movie_id = SUBSTRING(UUID(), 1, 8);

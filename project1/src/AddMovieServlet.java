@@ -41,12 +41,23 @@ public class AddMovieServlet extends HttpServlet {
 
             // Check if the movie already exists
             System.out.println("Before checking movie exist");
+            StringBuilder existingMovieId = new StringBuilder();
+            StringBuilder existingStarId = new StringBuilder();
+            StringBuilder existingGenreId = new StringBuilder();
 
             if (movieExists(dbCon, movieTitle, movieYear, movieDirector)) {
                 System.out.println("Inside if movieExists");
                 responseJsonObj.addProperty("status", "error");
                 responseJsonObj.addProperty("message", "Movie already exists in the database.");
-            } else {
+            } else if(genreExists(dbCon, genreName, existingMovieId, existingStarId, existingGenreId)) {
+                
+                // If it's an existing genre entry, add information about existing IDs
+                responseJsonObj.addProperty("message", "Movie ID, Genre ID, and Star ID was found!");
+                responseJsonObj.addProperty("existingStarId", existingStarId.toString());
+                responseJsonObj.addProperty("existingGenreId", existingGenreId.toString());
+                responseJsonObj.addProperty("existingMovieId", existingMovieId.toString());
+            }
+            else {
                 System.out.println("Inside if movieExists");
                 // Prepare SQL call to add_movie stored procedure
                 String query = "{CALL add_movie(?, ?, ?, ?, ?, ?, ?, ?)}";
@@ -85,6 +96,8 @@ public class AddMovieServlet extends HttpServlet {
                     responseJsonObj.addProperty("genreId", genreId);
                     System.out.println("after addProperty");
                 }
+
+
             }
 
         } catch (SQLException e) {
@@ -129,5 +142,32 @@ public class AddMovieServlet extends HttpServlet {
             }
         }
     }
+
+    private boolean genreExists(Connection connection, String genre, StringBuilder existingMovieId, StringBuilder existingStarId, StringBuilder existingGenreId) throws SQLException {
+        String query = "SELECT m.id AS movieId, s.id AS starId, g.id AS genreId\n" +
+                "FROM movies m\n" +
+                "JOIN stars_in_movies sim ON m.id = sim.movieId\n" +
+                "JOIN stars s ON sim.starId = s.id\n" +
+                "JOIN genres_in_movies gim ON m.id = gim.movieId\n" +
+                "JOIN genres g ON gim.genreId = g.id\n" +
+                "WHERE g.name = ?;\n";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, genre);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    existingMovieId.append(resultSet.getString("movieId"));
+                    existingStarId.append(resultSet.getString("starId"));
+                    existingGenreId.append(resultSet.getInt("genreId"));
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+    }
+
+
+
 }
 

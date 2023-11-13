@@ -86,7 +86,18 @@ $(document).ready(function () {
 function displayAddMovie(data) {
     let movieInfoDiv = $('#displayNewMovieData');
     console.log("add movie data: " + data);
-    if (data.status === "success") {
+    if (data.message === "Movie ID, Genre ID, and Star ID was found!") {
+        console.log("GenreExisting");
+        let existingMovieId = data.existingMovieId;
+        let existingStarId = data.existingStarId;
+        let existingGenreId = data.existingGenreId;
+        let rowHTML = "<h2>Existing Movie, Genre, Star Id:</h2>";
+        rowHTML += "<p>Existing Movie ID: " + existingMovieId + "</p>";
+        rowHTML += "<p>Existing Star ID: " + existingStarId + "</p>";
+        rowHTML += "<p>Existing Genre ID: " + existingGenreId + "</p>";
+        movieInfoDiv.html(rowHTML);
+    }
+    else if (data.status === "success") {
         let movieId = data.movieId;
         let starId = data.starId;
         let genreId = data.genreId;
@@ -96,15 +107,16 @@ function displayAddMovie(data) {
         rowHTML += "<p>Movie ID: " + movieId + "</p>";
         rowHTML += "<p>Star ID: " + starId + "</p>";
         rowHTML += "<p>Genre ID: " + genreId + "</p>";
-
         // Append the content to the movieInfoDiv
         movieInfoDiv.html(rowHTML);
 
         // Display an alert
         alert("Movie added successfully!");
-    } else {
-        alert("Failed to add movie. Reason: " + data.message);
     }
+    else {
+        alert("Cannot add movie because: " + data.message);
+    }
+
 }
 
 
