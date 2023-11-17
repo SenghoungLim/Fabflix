@@ -15,6 +15,7 @@ function metaDataTable(metadataResult) {
         tableBody.append(row);
     });
 }
+
 $.ajax(
     "api/_dashboard", {
         method: "GET",
@@ -82,7 +83,6 @@ $(document).ready(function () {
 
 //Add movie
 // Add the following JavaScript to your employee-dashboard.js
-
 function displayAddMovie(data) {
     let movieInfoDiv = $('#displayNewMovieData');
     console.log("add movie data: " + data);
@@ -111,14 +111,13 @@ function displayAddMovie(data) {
         movieInfoDiv.html(rowHTML);
 
         // Display an alert
-        alert("Movie added successfully!");
+        alert(data.message);
     }
     else {
-        alert("Cannot add movie because: " + data.message);
+        alert(data.message);
     }
 
 }
-
 
 function addMovie(event) {
     event.preventDefault();

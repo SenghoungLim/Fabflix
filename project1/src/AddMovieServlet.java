@@ -32,85 +32,59 @@ public class AddMovieServlet extends HttpServlet {
         try {
             dbCon = dataSource.getConnection();
 
-            // Get data from the form
             String movieTitle = request.getParameter("movieTitleInput");
             int movieYear = Integer.parseInt(request.getParameter("movieYearInput"));
             String movieDirector = request.getParameter("movieDirectorInput");
             String starName = request.getParameter("starNameMovieInput");
             String genreName = request.getParameter("genreNameInput");
 
-            // Check if the movie already exists
             System.out.println("Before checking movie exist");
-            StringBuilder existingMovieId = new StringBuilder();
-            StringBuilder existingStarId = new StringBuilder();
-            StringBuilder existingGenreId = new StringBuilder();
 
-            if (movieExists(dbCon, movieTitle, movieYear, movieDirector)) {
-                System.out.println("Inside if movieExists");
-                responseJsonObj.addProperty("status", "error");
-                responseJsonObj.addProperty("message", "Movie already exists in the database.");
-            } else if(genreExists(dbCon, genreName, existingMovieId, existingStarId, existingGenreId)) {
-                
-                // If it's an existing genre entry, add information about existing IDs
-                responseJsonObj.addProperty("message", "Movie ID, Genre ID, and Star ID was found!");
-                responseJsonObj.addProperty("existingStarId", existingStarId.toString());
-                responseJsonObj.addProperty("existingGenreId", existingGenreId.toString());
-                responseJsonObj.addProperty("existingMovieId", existingMovieId.toString());
+            System.out.println("Inside if movieExists");
+
+            String query = "{CALL add_movie(?, ?, ?, ?, ?, ?, ?, ?, ?)}";
+            System.out.println("ELSE after call add_movie");
+
+            try (CallableStatement callableStatement = dbCon.prepareCall(query)) {
+                callableStatement.setString(1, movieTitle);
+                callableStatement.setInt(2, movieYear);
+                callableStatement.setString(3, movieDirector);
+                callableStatement.setString(4, starName);
+                callableStatement.setString(5, genreName);
+
+                // Register output parameters
+                callableStatement.registerOutParameter(6, Types.VARCHAR); // p_movie_id
+                callableStatement.registerOutParameter(7, Types.VARCHAR); // p_star_id
+                callableStatement.registerOutParameter(8, Types.INTEGER); // p_genre_id
+                callableStatement.registerOutParameter(9, Types.VARCHAR); // p_message
+
+                // Execute the stored procedure
+                callableStatement.executeUpdate();
+
+                // Retrieve the generated IDs and message
+                String movieId = callableStatement.getString(6);
+                String starId = callableStatement.getString(7);
+                int genreId = callableStatement.getInt(8);
+                String message = callableStatement.getString(9);
+
+                // Build a response indicating success
+                responseJsonObj.addProperty("status", "success");
+                responseJsonObj.addProperty("message", message);
+                responseJsonObj.addProperty("movieId", movieId);
+                responseJsonObj.addProperty("starId", starId);
+                responseJsonObj.addProperty("genreId", genreId);
             }
-            else {
-                System.out.println("Inside if movieExists");
-                // Prepare SQL call to add_movie stored procedure
-                String query = "{CALL add_movie(?, ?, ?, ?, ?, ?, ?, ?)}";
-                System.out.println("ELSE after call add_movie");
-                try (CallableStatement callableStatement = dbCon.prepareCall(query)) {
-                    System.out.println("Inside try of add_movie");
-                    callableStatement.setString(1, movieTitle);
-                    callableStatement.setInt(2, movieYear);
-                    callableStatement.setString(3, movieDirector);
-                    callableStatement.setString(4, starName);
-                    callableStatement.setString(5, genreName);
-                    System.out.println("After setString");
-                    // Register output parameters
-                    callableStatement.registerOutParameter(6, Types.VARCHAR); // p_movie_id
-                    callableStatement.registerOutParameter(7, Types.VARCHAR); // p_star_id
-                    callableStatement.registerOutParameter(8, Types.INTEGER); // p_genre_id
-                    System.out.println("After registerOut");
-                    // Execute the stored procedure
-                    callableStatement.executeUpdate();
-                    System.out.println("After callable executeUpdate");
-                    //Retrieve the generated IDs
-                    String movieId = callableStatement.getString(6);
-                    String starId = callableStatement.getString(7);
-                    int genreId = callableStatement.getInt(8);
-
-                    // Build a response indicating success
-                    responseJsonObj.addProperty("status", "success");
-                    responseJsonObj.addProperty("message", "Movie added successfully");
-                    responseJsonObj.addProperty("movieTitle", movieTitle);
-                    responseJsonObj.addProperty("movieYear", movieYear);
-                    responseJsonObj.addProperty("movieDirector", movieDirector);
-                    responseJsonObj.addProperty("starName", starName);
-                    responseJsonObj.addProperty("genreName", genreName);
-                    responseJsonObj.addProperty("movieId", movieId);
-                    responseJsonObj.addProperty("starId", starId);
-                    responseJsonObj.addProperty("genreId", genreId);
-                    System.out.println("after addProperty");
-                }
-
-
-            }
-
         } catch (SQLException e) {
             e.printStackTrace();
             responseJsonObj.addProperty("status", "error");
-            responseJsonObj.addProperty("message", "SQL error in doPost: " + e.getMessage());
+            responseJsonObj.addProperty("message",  e.getMessage());
+
             // Print SQL state and error code
             System.out.println("SQL State: " + e.getSQLState());
             System.out.println("Error Code: " + e.getErrorCode());
             response.getWriter().write(responseJsonObj.toString());
             return;
         } finally {
-            // Close resources in the finally block
             try {
                 if (dbCon != null) {
                     dbCon.close();
@@ -124,47 +98,6 @@ public class AddMovieServlet extends HttpServlet {
         response.getWriter().write(responseJsonObj.toString());
         System.out.println("AddMovie response: " + responseJsonObj);
         System.out.println("End of doPost method");
-    }
-
-    // Helper method to check if the movie already exists
-    private boolean movieExists(Connection connection, String title, int year, String director) throws SQLException {
-        String query = "SELECT COUNT(*) FROM movies WHERE title = ? AND year = ? AND director = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, title);
-            preparedStatement.setInt(2, year);
-            preparedStatement.setString(3, director);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                System.out.println("Result from query: " + resultSet);
-                resultSet.next();
-                int count = resultSet.getInt(1);
-                return count > 0;
-            }
-        }
-    }
-
-    private boolean genreExists(Connection connection, String genre, StringBuilder existingMovieId, StringBuilder existingStarId, StringBuilder existingGenreId) throws SQLException {
-        String query = "SELECT m.id AS movieId, s.id AS starId, g.id AS genreId\n" +
-                "FROM movies m\n" +
-                "JOIN stars_in_movies sim ON m.id = sim.movieId\n" +
-                "JOIN stars s ON sim.starId = s.id\n" +
-                "JOIN genres_in_movies gim ON m.id = gim.movieId\n" +
-                "JOIN genres g ON gim.genreId = g.id\n" +
-                "WHERE g.name = ?;\n";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, genre);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    existingMovieId.append(resultSet.getString("movieId"));
-                    existingStarId.append(resultSet.getString("starId"));
-                    existingGenreId.append(resultSet.getInt("genreId"));
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }
     }
 
 
