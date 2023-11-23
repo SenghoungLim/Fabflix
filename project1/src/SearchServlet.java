@@ -66,7 +66,7 @@ public class SearchServlet extends HttpServlet {
                 }
 
                 if (!starName.isEmpty()) {
-                    statement.setString(paramIndex, "%" + starName + "%");
+                    statement.setString(paramIndex++, "%" + starName + "%");
                     countStatement.setString(paramIndex1, "%" + starName + "%");
                 }
 
@@ -132,6 +132,8 @@ public class SearchServlet extends HttpServlet {
         queryBuilder.append("    FROM movies m ");
         queryBuilder.append("    LEFT JOIN genres_in_movies gm ON m.id = gm.movieId ");
         queryBuilder.append("    LEFT JOIN genres g ON gm.genreId = g.id ");
+        queryBuilder.append("    LEFT JOIN stars_in_movies sm ON m.id = sm.movieId ");
+        queryBuilder.append("    LEFT JOIN stars s ON sm.starId = s.id ");
         queryBuilder.append("    WHERE 1 = 1");
 
         if (!title.isEmpty()) {
@@ -191,6 +193,8 @@ public class SearchServlet extends HttpServlet {
         queryBuilder.append("FROM ( ");
         queryBuilder.append("    SELECT 1 "); // Change: Select a constant value
         queryBuilder.append("    FROM movies m ");
+        queryBuilder.append("    LEFT JOIN stars_in_movies sm ON m.id = sm.movieId ");
+        queryBuilder.append("    LEFT JOIN stars s ON sm.starId = s.id ");
         queryBuilder.append("    WHERE 1 = 1");
 
         if (!title.isEmpty()) {

@@ -95,14 +95,20 @@ public class DOMParser {
 
         for (int i = 0; i < directorFilmsList.getLength(); i++) {
             Element directorFilmsElement = (Element) directorFilmsList.item(i);
-            director = getTextValue(directorFilmsElement, "dirn");
-            parseFilms(directorFilmsElement);
+
+            NodeList directorList = directorFilmsElement.getElementsByTagName("director");
+            Element directorElement = (Element) directorList.item(0);
+            director = getTextValue(directorElement, "dirname");
+
+            NodeList filmsList = directorFilmsElement.getElementsByTagName("films");
+            Element filmsElement = (Element) filmsList.item(0);
+            parseFilms(filmsElement);
         }
     }
 
     // Method to parse films in mains243.xml
     private void parseFilms(Element element) {
-        NodeList filmsList = element.getElementsByTagName("films");
+        NodeList filmsList = element.getElementsByTagName("film");
         for (int i = 0; i < filmsList.getLength(); i++) {
             Element filmElement = (Element) filmsList.item(i);
             parseFilm(filmElement);
@@ -170,8 +176,8 @@ public class DOMParser {
 
     // Method to parse casts124.xml
     private void parseCast124(Document dom) {
-        Element moviesElement = dom.getDocumentElement();
-        NodeList directorFilmsList = moviesElement.getElementsByTagName("dirfilms");
+        Element castsElement = dom.getDocumentElement();
+        NodeList directorFilmsList = castsElement.getElementsByTagName("dirfilms");
 
         for (int i = 0; i < directorFilmsList.getLength(); i++) {
             Element directorFilmsElement = (Element) directorFilmsList.item(i);
@@ -183,8 +189,13 @@ public class DOMParser {
     private void parseStars(Element element) {
         NodeList filmsList = element.getElementsByTagName("filmc");
         for (int i = 0; i < filmsList.getLength(); i++) {
-            Element mElement = (Element) filmsList.item(i);
-            parseStar(mElement);
+            Element filmcElement = (Element) filmsList.item(i);
+
+            NodeList mList = filmcElement.getElementsByTagName("m");
+            for (int j = 0; j < mList.getLength(); j++) {
+                Element mElement = (Element) mList.item(j);
+                parseStar(mElement);
+            }
         }
     }
 
@@ -219,13 +230,13 @@ public class DOMParser {
 
         // Check if starDict already contains a star with the same actor name
         boolean starWithSameNameExists = starDict.values().stream()
-                .anyMatch(star -> actorName.toLowerCase().equals(star.getName().toLowerCase()));
+                .anyMatch(star -> actorName.equals(star.getName()));
 
         if (starWithSameNameExists) {
             // Find the star with the same actor name
             String existingStarId = starDict.entrySet()
                     .stream()
-                    .filter(entry -> actorName.toLowerCase().equals(entry.getValue().getName().toLowerCase()))
+                    .filter(entry -> actorName.equals(entry.getValue().getName()))
                     .map(Map.Entry::getKey)
                     .findFirst()
                     .orElse(null);
@@ -308,9 +319,12 @@ public class DOMParser {
 
     public Map<String, String> getGenresInMovieDict() {return genresInMovieDict;}
 
-    /*
+
     public static void main(String[] args) {
         DOMParser domParser = new DOMParser();
+        domParser.runMains243();
+        domParser.runCasts124();
+        domParser.runActors63();
     }
-    */
+
 }
