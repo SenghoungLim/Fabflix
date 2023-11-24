@@ -45,20 +45,20 @@ public class LoginServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         System.out.println("LoginServlet Started");
 
-        String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
-        System.out.println("gRecaptchaResponse=" + gRecaptchaResponse);
+//        String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
+//        System.out.println("gRecaptchaResponse=" + gRecaptchaResponse);
 
         // Verify reCAPTCHA
-        try {
-            RecaptchaVerifyUtils.verify(gRecaptchaResponse);
-            System.out.println("reCAPTCHA Verification Success" );
-
-        } catch (Exception e) {
-            responseJsonObject.addProperty("status", "fail");
-            response.getWriter().write(responseJsonObject.toString());
-            out.close();
-            return;
-        }
+//        try {
+//            RecaptchaVerifyUtils.verify(gRecaptchaResponse);
+//            System.out.println("reCAPTCHA Verification Success" );
+//
+//        } catch (Exception e) {
+//            responseJsonObject.addProperty("status", "fail");
+//            response.getWriter().write(responseJsonObject.toString());
+//            out.close();
+//            return;
+//        }
         try {
             // Create a new connection to database
             Connection dbCon = dataSource.getConnection();
@@ -137,7 +137,7 @@ public class LoginServlet extends HttpServlet {
             responseJsonObject.addProperty("message", "SQL error in doPost: " + e.getMessage());
             response.getWriter().write(responseJsonObject.toString());
 
-            // Output Error Massage to html
+            // Output Error Message to html
             //out.println(String.format("<html><head><title>MovieDBExample: Error</title></head>\n<body><p>SQL error in doPost: %s</p></body></html>", e.getMessage()));
             return;
         }
