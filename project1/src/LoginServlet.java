@@ -44,12 +44,13 @@ public class LoginServlet extends HttpServlet {
         // Output stream to STDOUT
         PrintWriter out = response.getWriter();
         System.out.println("LoginServlet Started");
-        String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
         String mobile = request.getParameter("mobile");
+        mobile = (mobile != null && !mobile.isEmpty()) ? mobile : null;
 
         // Verify reCAPTCHA
-        if (!"true".equals(mobile) || mobile == null) {
+        if (mobile == null || !"true".equalsIgnoreCase(mobile)) {
             try {
+                String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
                 RecaptchaVerifyUtils.verify(gRecaptchaResponse);
                 System.out.println("reCAPTCHA Verification Success");
 
