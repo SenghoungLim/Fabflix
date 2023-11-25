@@ -45,20 +45,7 @@ public class LoginServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         System.out.println("LoginServlet Started");
 
-        String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
-        System.out.println("gRecaptchaResponse=" + gRecaptchaResponse);
 
-        // Verify reCAPTCHA
-        try {
-            RecaptchaVerifyUtils.verify(gRecaptchaResponse);
-            System.out.println("reCAPTCHA Verification Success" );
-
-        } catch (Exception e) {
-            responseJsonObject.addProperty("status", "fail");
-            response.getWriter().write(responseJsonObject.toString());
-            out.close();
-            return;
-        }
         try {
             // Create a new connection to database
             Connection dbCon = dataSource.getConnection();
@@ -68,60 +55,74 @@ public class LoginServlet extends HttpServlet {
 
             String username = request.getParameter("username");
             String password = request.getParameter("password");
+            String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
+            String mobile = request.getParameter("mobile");
 
-            String query = "SELECT * FROM customers WHERE email = ?";
-            PreparedStatement preparedStatement = dbCon.prepareStatement(query);
-            preparedStatement.setString(1, username);
+            if (mobile != "true") {
+                // Verify reCAPTCHA
+                try {
+                    RecaptchaVerifyUtils.verify(gRecaptchaResponse);
+                    System.out.println("reCAPTCHA Verification Success");
+
+                } catch (Exception e) {
+                    responseJsonObject.addProperty("status", "fail");
+                    response.getWriter().write(responseJsonObject.toString());
+                    out.close();
+                    return;
+                }
+            } else {
+                String query = "SELECT * FROM customers WHERE email = ?";
+                PreparedStatement preparedStatement = dbCon.prepareStatement(query);
+                preparedStatement.setString(1, username);
 //            preparedStatement.setString(2, password);
 
-            // Log to localhost log
-            request.getServletContext().log("query：" + query);
-
-            // Perform the query
-            ResultSet rs = preparedStatement.executeQuery();
-            //user id to identify user
-            String userId = "";
-            // Process the data
-            Boolean success = false;
-            if (rs.next()) {
-                String storedEncryptedPassword = rs.getString("password");
-                success = new StrongPasswordEncryptor().checkPassword(password, storedEncryptedPassword);
-                if(success) {
-                    HttpSession session = request.getSession(true);
-                    userId = rs.getString("id");
-                    session.setAttribute("user", new User(username));
-                    session.setAttribute("loggedIn", "true");
-                    session.setAttribute("id", userId);
-                    //String encryptedPassword = rs.getString("password");
-                    //success = new StrongPasswordEncryptor().checkPassword(password, encryptedPassword);
-                    System.out.println("user ID," + userId);
-                    System.out.println("user email (user): " + session.getAttribute("user"));
-                    System.out.println("isLoggedIn: " + session.getAttribute("loggedIn"));
-                    responseJsonObject.addProperty("status", "success");
-                    responseJsonObject.addProperty("message", "success");
-                }else{
-                    responseJsonObject.addProperty("status", "fail");
-                    responseJsonObject.addProperty("message", "incorrect password");
-                }
-            }
-            else{
-                // Login fail
-                responseJsonObject.addProperty("status", "fail");
                 // Log to localhost log
-                request.getServletContext().log("Login failed");
-                // sample error messages. in practice, it is not a good idea to tell user which one is incorrect/not exist.
-                if (!username.equals(username)) {
-                    responseJsonObject.addProperty("message", "user " + username + " doesn't exist");
+                request.getServletContext().log("query：" + query);
+
+                // Perform the query
+                ResultSet rs = preparedStatement.executeQuery();
+                //user id to identify user
+                String userId = "";
+                // Process the data
+                Boolean success = false;
+                if (rs.next()) {
+                    String storedEncryptedPassword = rs.getString("password");
+                    success = new StrongPasswordEncryptor().checkPassword(password, storedEncryptedPassword);
+                    if (success) {
+                        HttpSession session = request.getSession(true);
+                        userId = rs.getString("id");
+                        session.setAttribute("user", new User(username));
+                        session.setAttribute("loggedIn", "true");
+                        session.setAttribute("id", userId);
+                        //String encryptedPassword = rs.getString("password");
+                        //success = new StrongPasswordEncryptor().checkPassword(password, encryptedPassword);
+                        System.out.println("user ID," + userId);
+                        System.out.println("user email (user): " + session.getAttribute("user"));
+                        System.out.println("isLoggedIn: " + session.getAttribute("loggedIn"));
+                        responseJsonObject.addProperty("status", "success");
+                        responseJsonObject.addProperty("message", "success");
+                    } else {
+                        responseJsonObject.addProperty("status", "fail");
+                        responseJsonObject.addProperty("message", "incorrect password");
+                    }
                 } else {
-                    responseJsonObject.addProperty("message", "incorrect password");
+                    // Login fail
+                    responseJsonObject.addProperty("status", "fail");
+                    // Log to localhost log
+                    request.getServletContext().log("Login failed");
+                    // sample error messages. in practice, it is not a good idea to tell user which one is incorrect/not exist.
+                    if (!username.equals(username)) {
+                        responseJsonObject.addProperty("message", "user " + username + " doesn't exist");
+                    } else {
+                        responseJsonObject.addProperty("message", "incorrect password");
+                    }
                 }
+
+                response.getWriter().write(responseJsonObject.toString());
+                rs.close();
+                statement.close();
+                dbCon.close();
             }
-
-            response.getWriter().write(responseJsonObject.toString());
-            rs.close();
-            statement.close();
-            dbCon.close();
-
         } catch (Exception e) {
             /*
              * After you deploy the WAR file through tomcat manager webpage,
