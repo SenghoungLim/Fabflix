@@ -45,18 +45,20 @@ public class LoginServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         System.out.println("LoginServlet Started");
         String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
-        //String mobile = request.getParameter("mobile");
+        String mobile = request.getParameter("mobile");
 
         // Verify reCAPTCHA
-        try {
-            RecaptchaVerifyUtils.verify(gRecaptchaResponse);
-            System.out.println("reCAPTCHA Verification Success");
+        if (mobile == null || mobile.isEmpty()) {
+            try {
+                RecaptchaVerifyUtils.verify(gRecaptchaResponse);
+                System.out.println("reCAPTCHA Verification Success");
 
-        } catch (Exception e) {
-            responseJsonObject.addProperty("status", "fail");
-            response.getWriter().write(responseJsonObject.toString());
-            out.close();
-            return;
+            } catch (Exception e) {
+                responseJsonObject.addProperty("status", "fail");
+                response.getWriter().write(responseJsonObject.toString());
+                out.close();
+                return;
+            }
         }
         try{
             // Create a new connection to database
