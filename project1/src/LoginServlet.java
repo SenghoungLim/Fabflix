@@ -48,7 +48,7 @@ public class LoginServlet extends HttpServlet {
         String mobile = request.getParameter("mobile");
 
         // Verify reCAPTCHA
-        if (mobile == null || mobile.isEmpty()) {
+        //if (mobile == null || mobile.isEmpty()) {
             try {
                 RecaptchaVerifyUtils.verify(gRecaptchaResponse);
                 System.out.println("reCAPTCHA Verification Success");
@@ -59,7 +59,7 @@ public class LoginServlet extends HttpServlet {
                 out.close();
                 return;
             }
-        }
+        //}
         try{
             // Create a new connection to database
             Connection dbCon = dataSource.getConnection();
