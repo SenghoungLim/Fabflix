@@ -42,6 +42,7 @@ public class SearchMobileServlet extends HttpServlet {
                             // Retrieve movie details from the result set
                             String title = resultSet.getString("title");
                             int year = resultSet.getInt("year");
+                            // Add more properties as needed
 
                             // Create a JSON response
                             String jsonResponse = String.format("{\"title\": \"%s\", \"year\": %d}", title, year);

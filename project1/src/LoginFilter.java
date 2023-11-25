@@ -41,7 +41,8 @@ public class LoginFilter implements Filter {
          Always allow your own login related requests(html, js, servlet, etc..)
          You might also want to allow some CSS files, etc..
          */
-        return allowedURIs.stream().anyMatch(requestURI.toLowerCase()::endsWith) || requestURI.contains("images");
+        return true;
+        //return allowedURIs.stream().anyMatch(requestURI.toLowerCase()::endsWith) || requestURI.contains("images");
     }
 
     public void init(FilterConfig fConfig) {
@@ -52,6 +53,8 @@ public class LoginFilter implements Filter {
         allowedURIs.add("employee-login.html");
         allowedURIs.add("/_dashboard");
         allowedURIs.add("employee-login.js");
+        allowedURIs.add("/androidLogin");
+
     }
 
     public void destroy() {
