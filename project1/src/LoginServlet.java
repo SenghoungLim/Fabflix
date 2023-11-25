@@ -48,7 +48,7 @@ public class LoginServlet extends HttpServlet {
         String mobile = request.getParameter("mobile");
 
         // Verify reCAPTCHA
-        if (mobile != "true") {
+        if (!"true".equals(mobile) || mobile == null) {
             try {
                 RecaptchaVerifyUtils.verify(gRecaptchaResponse);
                 System.out.println("reCAPTCHA Verification Success");
