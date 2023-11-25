@@ -85,7 +85,14 @@ public class LoginMobileServlet extends HttpServlet {
 
     }
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        doPost(request, response);
+        response.setContentType("application/json");
+        JsonObject responseJsonObj = new JsonObject();
+
+        responseJsonObj.addProperty("status", "success");
+        responseJsonObj.addProperty("message", "doGet method end points");
+
+        response.getWriter().write(responseJsonObj.toString());
+
         System.out.print("doGet for mobile");
     }
     private void MobileSuccessLogin (JsonObject responseJsonObj){
