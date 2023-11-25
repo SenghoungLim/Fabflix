@@ -21,7 +21,7 @@ import org.jasypt.util.password.StrongPasswordEncryptor;
  * generates output as a html <table>
  */
 
-@WebServlet(name = "LoginMobileServlet", urlPatterns = "/api/android-login")
+@WebServlet(name = "LoginMobileServlet", urlPatterns = "/api/androidLogin")
 public class LoginMobileServlet extends HttpServlet {
 
     // Create a dataSource which registered in web.xml
