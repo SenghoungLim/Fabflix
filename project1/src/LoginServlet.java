@@ -49,16 +49,16 @@ public class LoginServlet extends HttpServlet {
 
         // Verify reCAPTCHA
         //if (mobile == null || mobile.isEmpty()) {
-            try {
-                RecaptchaVerifyUtils.verify(gRecaptchaResponse);
-                System.out.println("reCAPTCHA Verification Success");
-
-            } catch (Exception e) {
-                responseJsonObject.addProperty("status", "fail");
-                response.getWriter().write(responseJsonObject.toString());
-                out.close();
-                return;
-            }
+//            try {
+//                RecaptchaVerifyUtils.verify(gRecaptchaResponse);
+//                System.out.println("reCAPTCHA Verification Success");
+//
+//            } catch (Exception e) {
+//                responseJsonObject.addProperty("status", "fail");
+//                response.getWriter().write(responseJsonObject.toString());
+//                out.close();
+//                return;
+//            }
         //}
         try{
             // Create a new connection to database
