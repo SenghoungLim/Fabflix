@@ -44,7 +44,7 @@ public class LoginServlet extends HttpServlet {
         // Output stream to STDOUT
         PrintWriter out = response.getWriter();
         System.out.println("LoginServlet Started");
-        String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
+        //String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
         String mobile = request.getParameter("mobile");
 
         // Verify reCAPTCHA
