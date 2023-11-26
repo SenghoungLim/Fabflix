@@ -7,7 +7,7 @@ let login_form = $("#login_form");
 function handleLoginResult(resultDataString) {
     let resultDataJson = JSON.parse(resultDataString);
 
-    console.log("handle login response");
+    console.log("Handle login response");
     console.log(resultDataJson);
     console.log(resultDataJson["status"]);
 
@@ -17,7 +17,7 @@ function handleLoginResult(resultDataString) {
     } else {
         // If login fails, the web page will display
         // error messages on <div> with id "login_error_message"
-        console.log("show error message");
+        console.log("Show error message");
         console.log(resultDataJson["message"]);
         //$("#login_error_message").text(resultDataJson["message"]);
         alert("Your username or password is incorrect or you have not verify with recaptcha, please try again.");
@@ -29,7 +29,7 @@ function handleLoginResult(resultDataString) {
  * @param formSubmitEvent
  */
 function submitLoginForm(formSubmitEvent) {
-    console.log("submit login form");
+    console.log("Submit login form");
     /**
      * When users click the submit button, the browser will not direct
      * users to the url defined in HTML form. Instead, it will call this

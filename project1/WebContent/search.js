@@ -202,5 +202,5 @@ function displayCartData(resultData) {
         $("#testItem").text("Cart is empty");
     }
 
-    console.log("displayCartData ended");
+    console.log("DisplayCartData ended");
 }

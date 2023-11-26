@@ -85,7 +85,7 @@ $(document).ready(function () {
 });
 
 function handleGenres(resultData) {
-    console.log("handleMovieResult: populating genres");
+    console.log("HandleMovieResult: populating genres");
 
     // Find the empty container by ID "movieList"
     let movieList = jQuery("#genres");
@@ -106,7 +106,7 @@ function handleGenres(resultData) {
 }
 
 function handleLetters() {
-    console.log("handleLetters: populating alphabet letters");
+    console.log("HandleLetters: populating alphabet letters");
 
     // Find the empty container by ID "letters"
     let lettersList = jQuery("#letters");

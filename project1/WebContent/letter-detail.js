@@ -58,7 +58,7 @@ function getParameterByName(target) {
  * @param resultData jsonObject
  */
 function handleResult(resultData) {
-    console.log("handleMovieResult: populating letter Results");
+    console.log("HandleMovieResult: populating letter Results");
 
     let letter_results = jQuery("#letter-results");
 

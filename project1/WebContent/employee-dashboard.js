@@ -1,5 +1,5 @@
 function metaDataTable(metadataResult) {
-    console.log("metadataResult", metadataResult);
+    console.log("MetadataResult", metadataResult);
 
     let tableBody = $('#metaDataTable tbody');
 
@@ -20,7 +20,7 @@ $.ajax(
     "api/_dashboard", {
         method: "GET",
         complete: function() {
-            console.log("meta data request completed");
+            console.log("Meta data request completed");
         },
         success: metaDataTable
     }
@@ -85,7 +85,7 @@ $(document).ready(function () {
 // Add the following JavaScript to your employee-dashboard.js
 function displayAddMovie(data) {
     let movieInfoDiv = $('#displayNewMovieData');
-    console.log("add movie data: " + data);
+    console.log("Add movie data: " + data);
     if (data.message === "Movie ID, Genre ID, and Star ID was found!") {
         console.log("GenreExisting");
         let existingMovieId = data.existingMovieId;

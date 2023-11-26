@@ -60,7 +60,7 @@ function getParameterByName(target) {
  * @param resultData jsonObject
  */
 function handleResult(resultData) {
-    console.log("handleMovieResult: populating genre Results");
+    console.log("HandleMovieResult: populating genre Results");
 
     let genre_results = jQuery("#genre-results");
     genre_results.empty();
