@@ -18,7 +18,7 @@ function getParameterByName(target) {
  * @param resultData jsonObject
  */
 function handleResult(resultData) {
-    console.log("handleResult: populating movie details from resultData");
+    console.log("HandleResult: populating movie details from resultData");
 
     let movieTable = jQuery("#movie_table");
 
@@ -36,9 +36,10 @@ function handleResult(resultData) {
     let directorRow = '<tr><th>Director:</th><td>' + director + '</td></tr>';
 
     let genres = resultData[0]["genres"];
+    let genresRow;
     if (genres != null){
         genres = genres.split(', ');
-        let genresRow = '<tr><th>Genres:</th><td>';
+        genresRow = '<tr><th>Genres:</th><td>';
         // Create hyperlinks for each star
         for (let j = 0; j < genres.length; j++) {
             genresRow += "<a href='genre-detail.html?name=" + genres[j] + "'>" + genres[j] + "</a>";
@@ -48,15 +49,16 @@ function handleResult(resultData) {
         }
         genresRow += '</td></tr>';
     }else{
-        let genresRow = '<tr><th>Genres</th><td>' + genres + '</td></tr>';
+        genresRow = '<tr><th>Genres</th><td>' + genres + '</td></tr>';
     }
 
     let stars = resultData[0]["stars"];
     let starIds = resultData[0]["star_ids"];
+    let starsRow;
     if(stars != null && starIds != null) {
         stars = stars.split(', ');
         starIds = starIds.split(', ');
-        let starsRow = '<tr><th>Stars:</th><td>';
+        starsRow = '<tr><th>Stars:</th><td>';
         // Create hyperlinks for each star
         for (let j = 0; j < stars.length; j++) {
             starsRow += "<a href='single-star.html?id=" + starIds[j] + "'>" + stars[j] + "</a>";
@@ -66,7 +68,7 @@ function handleResult(resultData) {
         }
         starsRow += '</td></tr>';
     }else{
-        let genresRow = '<tr><th>Stars</th><td>' + stars + '</td></tr>';
+        starsRow = '<tr><th>Stars</th><td>' + stars + '</td></tr>';
     }
 
     let ratingRow = '<tr><th>Rating:</th><td>' + rating + '</td></tr>';

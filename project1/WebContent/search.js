@@ -18,7 +18,7 @@ $(document).ready(function () {
 });
 
 document.getElementById("sortButton").addEventListener("click", function () {
-    var selectedOption = document.getElementById("sortOptions").value;
+    let selectedOption = document.getElementById("sortOptions").value;
 
     // Define your sorting logic here based on the selectedOption
     let sortField = null;
@@ -180,7 +180,7 @@ $(document).on("click", ".add-button", function () {
 function displayCartData(resultData) {
     console.log("displayCartData started");
     console.log(resultData);
-    // Check if the 'cart' property exists and it's an array with at least one item
+    // Check if the 'cart' property exists, and it's an array with at least one item
     if (Array.isArray(resultData.cart) && resultData.cart.length > 0) {
         // Access the first item in the 'cart' array
         let movie = resultData.cart[0];

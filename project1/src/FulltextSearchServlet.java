@@ -15,7 +15,7 @@ import java.sql.*;
 
 @WebServlet(name = "FulltextSearchServlet", urlPatterns = "/api/fulltext")
 public class FulltextSearchServlet extends HttpServlet {
-    private static final long serialVersionUID = 4L;
+    private static final long serialVersionUID = 8L;
     private DataSource dataSource;
 
     private static final String CREATE_INDEX_SQL = "ALTER TABLE ? ADD FULLTEXT INDEX ? (?)";
@@ -26,39 +26,34 @@ public class FulltextSearchServlet extends HttpServlet {
             dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/moviedb");
 
             // Create FULLTEXT index on 'title' column in 'movies' table
-            createFulltextIndex("movies", "title", "idx_movies_title");
-
-            // Create FULLTEXT index on 'name' column in 'stars' table
-            createFulltextIndex("stars", "name", "idx_stars_name");
+            createFulltextIndex();
         } catch (NamingException | SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void createFulltextIndex(String tableName, String columnName, String indexName) throws SQLException {
+    private void createFulltextIndex() throws SQLException {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement checkIndexStatement = connection.prepareStatement(INDEX_INFO_SQL);
              PreparedStatement createIndexStatement = connection.prepareStatement(CREATE_INDEX_SQL)) {
 
-            if (!doesIndexExist(connection, tableName, indexName)) {
-                createIndexStatement.setString(1, tableName);
-                createIndexStatement.setString(2, indexName);
-                createIndexStatement.setString(3, columnName);
+            if (!doesIndexExist(connection)) {
+                createIndexStatement.setString(1, "movies");
+                createIndexStatement.setString(2, "title");
+                createIndexStatement.setString(3, "idx_movies_title");
                 createIndexStatement.executeUpdate();
             }
         }
     }
 
-    private boolean doesIndexExist(Connection connection, String tableName, String indexName) throws SQLException {
+    private boolean doesIndexExist(Connection connection) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(INDEX_INFO_SQL)) {
-            statement.setString(1, tableName);
-            statement.setString(2, indexName);
+            statement.setString(1, "movies");
+            statement.setString(2, "idx_movies_title");
             try (ResultSet resultSet = statement.executeQuery()) {
                 return resultSet.next();
             }
         }
     }
-
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
@@ -69,8 +64,6 @@ public class FulltextSearchServlet extends HttpServlet {
 
         try (Connection dbCon = dataSource.getConnection()) {
             String fulltext = request.getParameter("fulltext");
-
-            System.out.println(fulltext);
 
             String query = buildQuery(sortField, sortOrder, fulltext);
 
@@ -90,8 +83,6 @@ public class FulltextSearchServlet extends HttpServlet {
                 String page = request.getParameter("page");
                 statement.setInt(paramIndex++, (Integer.parseInt(page) - 1) * moviePerPage); // Limit
                 statement.setInt(paramIndex, moviePerPage); // Offset
-
-                System.out.println(statement);
 
                 ResultSet rs = statement.executeQuery();
                 ResultSet rs1 = countStatement.executeQuery();
