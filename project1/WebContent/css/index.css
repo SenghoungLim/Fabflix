@@ -2,6 +2,30 @@ body{
     background: rgb(63,94,251);
     background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(252,70,107,1) 100%);
 }
+
+h1 {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    text-align: center; /* Center the text */
+}
+
+/* Style for the forms */
+#searchForm {
+    max-width: 600px; /* Set a maximum width for better readability */
+    margin: auto; /* Center the form horizontally */
+    padding: 20px; /* Add padding to the form */
+    border: 1px solid #ddd; /* Add a border for a cleaner look */
+    border-radius: 5px; /* Add rounded corners */
+}
+
+/* Style for the input fields */
+#searchForm input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    margin: 4px 0;
+    box-sizing: border-box;
+}
+
 /* Decorate the card size, border and color*/
 .row > div {
     flex: 1;
