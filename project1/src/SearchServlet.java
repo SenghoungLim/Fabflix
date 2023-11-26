@@ -70,7 +70,7 @@ public class SearchServlet extends HttpServlet {
                     countStatement.setString(paramIndex1, "%" + starName + "%");
                 }
 
-                int moviePerPage = 25;
+                int moviePerPage = 10;
                 String page = request.getParameter("page");
                 statement.setInt(paramIndex++, (Integer.parseInt(page) - 1) * moviePerPage); // Limit
                 statement.setInt(paramIndex, moviePerPage); // Offset
