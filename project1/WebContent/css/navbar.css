@@ -1,3 +1,19 @@
+/* Style for the forms */
+#fulltextForm {
+    display: flex;
+    align-items: center; /* Center vertically */
+    margin-left: auto; /* Move the form all the way to the right */
+}
+
+/* Style for the input fields */
+#fulltextForm input[type="text"] {
+    width: 300px;
+    height: 30px; /* Corrected property name */
+    padding-right: 10px; /* Corrected property name */
+    margin: 4px 0;
+    box-sizing: border-box;
+}
+
 .navbar {
     background-color: #333; /* Background color for the navbar */
 }
