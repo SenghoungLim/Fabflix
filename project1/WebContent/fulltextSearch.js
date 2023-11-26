@@ -15,7 +15,7 @@ $(document).ready(function () {
 });
 
 document.getElementById("sortButton").addEventListener("click", function () {
-    var selectedOption = document.getElementById("sortOptions").value;
+    let selectedOption = document.getElementById("sortOptions").value;
 
     // Define your sorting logic here based on the selectedOption
     let sortField = null;
@@ -58,7 +58,7 @@ function getParameterByName(target) {
 
 function handleResult(resultData) {
 
-    console.log("handleMovieResult: populating Search Results");
+    console.log("HandleMovieResult: populating Search Results");
     console.log(resultData);
 
 
@@ -169,13 +169,13 @@ $(document).on("click", ".add-button", function () {
             // You can update the cart or display a message here
             let resultDataJson = JSON.parse(resultDataString);
             displayCartData(resultDataJson);
-            console.log("result send back from servlet" + resultDataJson);
+            console.log("Result send back from servlet" + resultDataJson);
         }
     });
 });
 
 function displayCartData(resultData) {
-    console.log("displayCartData started");
+    console.log("DisplayCartData started");
     console.log(resultData);
     // Check if the 'cart' property exists and it's an array with at least one item
     if (Array.isArray(resultData.cart) && resultData.cart.length > 0) {
@@ -199,5 +199,5 @@ function displayCartData(resultData) {
         $("#testItem").text("Cart is empty");
     }
 
-    console.log("displayCartData ended");
+    console.log("DisplayCartData ended");
 }

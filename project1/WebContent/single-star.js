@@ -18,7 +18,7 @@ function getParameterByName(target) {
  * @param resultData jsonObject
  */
 function handleResult(resultData) {
-    console.log("handleResult: populating star details from resultData");
+    console.log("HandleResult: populating star details from resultData");
 
     let starTable = jQuery("#star-table");
 

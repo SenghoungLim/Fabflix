@@ -8,7 +8,7 @@ let currentPage = parseInt(getParameterByName('page')) || 1;
 let moviePerPage = 25;
 
 document.getElementById("sortButton").addEventListener("click", function () {
-    var selectedOption = document.getElementById("sortOptions").value;
+    let selectedOption = document.getElementById("sortOptions").value;
 
 // Define your sorting logic here based on the selectedOption
     let sortField = null;
@@ -60,7 +60,7 @@ function getParameterByName(target) {
  * @param resultData jsonObject
  */
 function handleResult(resultData) {
-    console.log("handleMovieResult: populating genre Results");
+    console.log("HandleMovieResult: populating genre Results");
 
     let genre_results = jQuery("#genre-results");
     genre_results.empty();
