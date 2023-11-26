@@ -82,10 +82,11 @@ function handleNormalSearch(query) {
     console.log("Doing normal search with query: " + query);
     // TODO: you should do a normal search here - X
     // Check if the query is not empty
-    if (query.trim() !== '') {
+    if (query.trim() !== "") {
         window.location = "fulltextSearch.html?fulltext=" + query;
     } else {
         // If the query is empty, show an alert or provide user feedback
+        console.log("Query is empty");
         window.location = "index.html";
     }
 }
