@@ -8,7 +8,7 @@ let currentPage = parseInt(getParameterByName('page')) || 1;
 let moviePerPage = 25;
 
 document.getElementById("sortButton").addEventListener("click", function () {
-    var selectedOption = document.getElementById("sortOptions").value;
+    let selectedOption = document.getElementById("sortOptions").value;
 
 // Define your sorting logic here based on the selectedOption
     let sortField = null;

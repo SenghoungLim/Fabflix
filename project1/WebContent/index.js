@@ -138,3 +138,4 @@ jQuery.ajax({
 
 // Call the function to handle alphabet letters
 handleLetters();
+
