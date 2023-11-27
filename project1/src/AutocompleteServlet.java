@@ -56,7 +56,7 @@ public class AutocompleteServlet extends HttpServlet {
         String[] words = input.split("\\s+");
 
         for (int i = 0; i < words.length; i++) {
-            modifiedStringBuilder.append(words[i]).append("*");
+            modifiedStringBuilder.append("+").append(words[i]).append("*");
             if (i < words.length - 1) {
                 modifiedStringBuilder.append(" ");
             }
