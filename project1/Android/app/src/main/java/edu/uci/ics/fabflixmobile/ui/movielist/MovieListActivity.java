@@ -68,7 +68,7 @@
             final StringRequest searchRequest = new StringRequest(
 
                     Request.Method.GET,
-                    baseUrl + "/api/form?title=" + query + "&year=&director&starName&page=" + curPage ,
+                    baseUrl + "/api/fulltext?fulltext=" + query + "&page=" + curPage ,
                     response -> {
                         try {
                             Log.d("Movies response: ", String.valueOf(response));
