@@ -135,7 +135,7 @@ public class AutocompleteServlet extends HttpServlet {
             queryBuilder.append(" AND m.title LIKE ?");
 
             // Full-text search using MATCH ... AGAINST
-            queryBuilder.append(" AND MATCH(m.title) AGAINST (? IN BOOLEAN MODE)");
+            queryBuilder.append(" OR MATCH(m.title) AGAINST (? IN BOOLEAN MODE)");
         }
 
         queryBuilder.append(" LIMIT 10");
