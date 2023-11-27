@@ -16,8 +16,8 @@ public class AutocompleteServlet extends HttpServlet {
     private static final long serialVersionUID = 9L;
     private DataSource dataSource;
 
-    private static final String CREATE_INDEX_SQL = "ALTER TABLE ? ADD FULLTEXT INDEX ? (?)";
-    private static final String INDEX_INFO_SQL = "SELECT INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_NAME = ? AND INDEX_NAME = ?";
+    private static final String CREATE_INDEX_SQL = "ALTER TABLE movies ADD FULLTEXT INDEX idx_movies_title (title)";
+    private static final String INDEX_INFO_SQL = "SELECT INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_NAME = 'movies' AND INDEX_NAME = 'idx_movies_title'";
 
     public void init(ServletConfig config) {
         try {
@@ -25,7 +25,9 @@ public class AutocompleteServlet extends HttpServlet {
 
             // Create FULLTEXT index on 'title' column in 'movies' table
             createFulltextIndex();
-        } catch (NamingException | SQLException e) {
+        } catch (NamingException e) {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
@@ -35,9 +37,6 @@ public class AutocompleteServlet extends HttpServlet {
              PreparedStatement createIndexStatement = connection.prepareStatement(CREATE_INDEX_SQL)) {
 
             if (!doesIndexExist(connection)) {
-                createIndexStatement.setString(1, "movies");
-                createIndexStatement.setString(2, "title");
-                createIndexStatement.setString(3, "idx_movies_title");
                 createIndexStatement.executeUpdate();
             }
         }
@@ -45,30 +44,43 @@ public class AutocompleteServlet extends HttpServlet {
 
     private boolean doesIndexExist(Connection connection) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(INDEX_INFO_SQL)) {
-            statement.setString(1, "movies");
-            statement.setString(2, "idx_movies_title");
             try (ResultSet resultSet = statement.executeQuery()) {
                 return resultSet.next();
             }
         }
     }
 
+    private static String modifyString(String input) {
+        StringBuilder modifiedStringBuilder = new StringBuilder();
+
+        String[] words = input.split("\\s+");
+
+        for (int i = 0; i < words.length; i++) {
+            modifiedStringBuilder.append(words[i]).append("*");
+            if (i < words.length - 1) {
+                modifiedStringBuilder.append(" ");
+            }
+        }
+
+        return modifiedStringBuilder.toString();
+    }
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try (Connection dbCon = dataSource.getConnection()) {
             String autocomplete = request.getParameter("autocomplete");
 
-            System.out.println(autocomplete);
+            String newAutocomplete = modifyString(autocomplete);
 
-            String query = buildQuery(autocomplete);
+            String query = buildQuery(newAutocomplete);
 
             try (PreparedStatement statement = dbCon.prepareStatement(query)) {
 
                 if (!autocomplete.isEmpty()) {
-                    // Set parameter for full-text search
-                    statement.setString(1, '+' + autocomplete + '*');
-
                     // Set parameter for SQL LIKE (partial matching)
-                    statement.setString(2, '%' + autocomplete + '%');
+                    statement.setString(1, '%' + autocomplete + '%');
+
+                    // Set parameter for full-text search
+                    statement.setString(2, newAutocomplete);
                 }
 
                 System.out.println(statement);
@@ -119,11 +131,11 @@ public class AutocompleteServlet extends HttpServlet {
         queryBuilder.append("WHERE 1 = 1");
 
         if (!fulltext.isEmpty()) {
-            // Full-text search using MATCH ... AGAINST
-            queryBuilder.append(" AND (MATCH(m.title) AGAINST (? IN BOOLEAN MODE)");
-
             // SQL LIKE for partial matching
-            queryBuilder.append(" OR m.title LIKE ?)");
+            queryBuilder.append(" AND m.title LIKE ?");
+
+            // Full-text search using MATCH ... AGAINST
+            queryBuilder.append(" AND MATCH(m.title) AGAINST (? IN BOOLEAN MODE)");
         }
 
         queryBuilder.append(" LIMIT 10");

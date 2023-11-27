@@ -52,6 +52,21 @@ public class FulltextSearchServlet extends HttpServlet {
         }
     }
 
+    private static String modifyString(String input) {
+        StringBuilder modifiedStringBuilder = new StringBuilder();
+
+        String[] words = input.split("\\s+");
+
+        for (int i = 0; i < words.length; i++) {
+            modifiedStringBuilder.append(words[i]).append("*");
+            if (i < words.length - 1) {
+                modifiedStringBuilder.append(" ");
+            }
+        }
+
+        return modifiedStringBuilder.toString();
+    }
+
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
@@ -63,6 +78,8 @@ public class FulltextSearchServlet extends HttpServlet {
         try (Connection dbCon = dataSource.getConnection()) {
             String fulltext = request.getParameter("fulltext");
 
+            fulltext = modifyString(fulltext);
+
             String query = buildQuery(sortField, sortOrder, fulltext);
 
             String countQuery = buildCountQuery(fulltext);
@@ -73,9 +90,12 @@ public class FulltextSearchServlet extends HttpServlet {
                 int paramIndex = 1;
                 int paramIndex1 = 1;
                 if (!fulltext.isEmpty()) {
-                    statement.setString(paramIndex++, '+' + fulltext + '*');
-                    countStatement.setString(paramIndex1, '+' + fulltext + '*');
+                    statement.setString(paramIndex++, fulltext);
+                    countStatement.setString(paramIndex1, fulltext);
                 }
+
+                System.out.println(fulltext);
+
 
                 int moviePerPage = 25;
                 String page = request.getParameter("page");
