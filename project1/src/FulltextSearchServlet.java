@@ -18,8 +18,8 @@ public class FulltextSearchServlet extends HttpServlet {
     private static final long serialVersionUID = 8L;
     private DataSource dataSource;
 
-    private static final String CREATE_INDEX_SQL = "ALTER TABLE ? ADD FULLTEXT INDEX ? (?)";
-    private static final String INDEX_INFO_SQL = "SELECT INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_NAME = ? AND INDEX_NAME = ?";
+    private static final String CREATE_INDEX_SQL = "ALTER TABLE movies ADD FULLTEXT INDEX idx_movies_title (title)";
+    private static final String INDEX_INFO_SQL = "SELECT INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_NAME = 'movies' AND INDEX_NAME = 'idx_movies_title'";
 
     public void init(ServletConfig config) {
         try {
@@ -27,7 +27,9 @@ public class FulltextSearchServlet extends HttpServlet {
 
             // Create FULLTEXT index on 'title' column in 'movies' table
             createFulltextIndex();
-        } catch (NamingException | SQLException e) {
+        } catch (NamingException e) {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
@@ -37,9 +39,6 @@ public class FulltextSearchServlet extends HttpServlet {
              PreparedStatement createIndexStatement = connection.prepareStatement(CREATE_INDEX_SQL)) {
 
             if (!doesIndexExist(connection)) {
-                createIndexStatement.setString(1, "movies");
-                createIndexStatement.setString(2, "title");
-                createIndexStatement.setString(3, "idx_movies_title");
                 createIndexStatement.executeUpdate();
             }
         }
@@ -47,13 +46,12 @@ public class FulltextSearchServlet extends HttpServlet {
 
     private boolean doesIndexExist(Connection connection) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(INDEX_INFO_SQL)) {
-            statement.setString(1, "movies");
-            statement.setString(2, "idx_movies_title");
             try (ResultSet resultSet = statement.executeQuery()) {
                 return resultSet.next();
             }
         }
     }
+
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
