@@ -1,14 +1,18 @@
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
+import jakarta.servlet.ServletContext;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
@@ -21,16 +25,16 @@ public class FulltextSearchServlet extends HttpServlet {
     private static final String CREATE_INDEX_SQL = "ALTER TABLE movies ADD FULLTEXT INDEX idx_movies_title (title)";
     private static final String INDEX_INFO_SQL = "SELECT INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_NAME = 'movies' AND INDEX_NAME = 'idx_movies_title'";
 
-    public void init(ServletConfig config) {
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config); // Add this line
+
         try {
             dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/moviedb");
 
             // Create FULLTEXT index on 'title' column in 'movies' table
             createFulltextIndex();
-        } catch (NamingException e) {
-            throw new RuntimeException(e);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (NamingException | SQLException e) {
+            throw new ServletException(e);
         }
     }
 
@@ -69,6 +73,22 @@ public class FulltextSearchServlet extends HttpServlet {
 
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        long elapsedTimeTJ;
+        long startTimeTS = System.nanoTime();
+
+        String contextPath = getServletContext().getRealPath("/");
+        String xmlFilePath = contextPath + "log_processing.*";
+        System.out.println(xmlFilePath);
+        File myfile = new File(xmlFilePath);
+
+        // Create the file if it doesn't exist
+        if (!myfile.exists()) {
+            myfile.createNewFile();
+        }
+
+        // Write to the file using FileWriter
+        FileWriter writer = new FileWriter(myfile, true);
+
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
@@ -102,8 +122,11 @@ public class FulltextSearchServlet extends HttpServlet {
                 statement.setInt(paramIndex++, (Integer.parseInt(page) - 1) * moviePerPage); // Limit
                 statement.setInt(paramIndex, moviePerPage); // Offset
 
+                long startTimeTJ = System.nanoTime();
                 ResultSet rs = statement.executeQuery();
                 ResultSet rs1 = countStatement.executeQuery();
+                long endTimeTJ = System.nanoTime();
+                elapsedTimeTJ = endTimeTJ - startTimeTJ; // elapsed time in nano seconds. Note: print the values in nanoseconds
 
                 JsonArray jsonArray = new JsonArray();
 
@@ -135,6 +158,13 @@ public class FulltextSearchServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_OK);
             }
 
+        long endTimeTS = System.nanoTime();
+        long elapsedTimeTS = endTimeTS - startTimeTS; // elapsed time in nano seconds. Note: print the values in nanoseconds 
+
+        String content = String.valueOf(elapsedTimeTS) + " " + String.valueOf(elapsedTimeTJ) + "\n";
+        // Write the content to the file
+        writer.write(content);
+
         } catch (SQLException | NumberFormatException e) {
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("errorMessage", e.getMessage());
@@ -144,6 +174,7 @@ public class FulltextSearchServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } finally {
             out.close();
+            writer.close(); // Add this line
         }
     }
 
