@@ -48,11 +48,12 @@ public class LoginServlet extends HttpServlet {
         mobile = (mobile != null && !mobile.isEmpty()) ? mobile : null;
 
         // Verify reCAPTCHA
+        /*
         if (mobile == null || !"true".equalsIgnoreCase(mobile)) {
             try {
-                String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
-                RecaptchaVerifyUtils.verify(gRecaptchaResponse);
-                System.out.println("reCAPTCHA Verification Success");
+                //String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
+                //RecaptchaVerifyUtils.verify(gRecaptchaResponse);
+                //System.out.println("reCAPTCHA Verification Success");
 
             } catch (Exception e) {
                 responseJsonObject.addProperty("status", "fail");
@@ -61,6 +62,7 @@ public class LoginServlet extends HttpServlet {
                 return;
             }
         }
+         */
         try(out; Connection dbCon = dataSource.getConnection();){
             // Declare a new statement
             Statement statement = dbCon.createStatement();
@@ -81,6 +83,7 @@ public class LoginServlet extends HttpServlet {
             //user id to identify user
             String userId = "";
             // Process the data
+            System.out.println("JMeter");
             Boolean success = false;
             if (rs.next()) {
                 String storedEncryptedPassword = rs.getString("password");
