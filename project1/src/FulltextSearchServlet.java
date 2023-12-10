@@ -97,7 +97,7 @@ public class FulltextSearchServlet extends HttpServlet {
                 System.out.println(statement);
 
 
-                int moviePerPage = 25;
+                int moviePerPage = 10;
                 String page = request.getParameter("page");
                 statement.setInt(paramIndex++, (Integer.parseInt(page) - 1) * moviePerPage); // Limit
                 statement.setInt(paramIndex, moviePerPage); // Offset
