@@ -77,7 +77,7 @@ public class FulltextSearchServlet extends HttpServlet {
         long startTimeTS = System.nanoTime();
 
         String contextPath = getServletContext().getRealPath("/");
-        String xmlFilePath = contextPath + "log_processing.*";
+        String xmlFilePath = contextPath + "log.txt";
         System.out.println(xmlFilePath);
         File myfile = new File(xmlFilePath);
 

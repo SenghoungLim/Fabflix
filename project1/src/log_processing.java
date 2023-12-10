@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TSTJAverageCalculator {
+public class log_processing {
     public static void main(String[] args) {
-        String filePath = "/Users/thientoanvu/Downloads/apache-tomcat-10.1.13/webapps/project1_war/log_processing.*";
+        String filePath = "/Users/thientoanvu/Downloads/apache-tomcat-10.1.13/webapps/project1_war/log.txt"; //replace log with the name of the file
 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -25,8 +25,8 @@ public class TSTJAverageCalculator {
             double averageTS = calculateAverage(TS);
             double averageTJ = calculateAverage(TJ);
 
-            System.out.println("Average of TS: " + averageTS + "nanoseconds");
-            System.out.println("Average of TJ: " + averageTJ + "nanoseconds");
+            System.out.println("Average of TS: " + averageTS + " nanoseconds");
+            System.out.println("Average of TJ: " + averageTJ + " nanoseconds");
 
         } catch (IOException | NumberFormatException e) {
             e.printStackTrace(); // Handle the exception according to your needs
