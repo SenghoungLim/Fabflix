@@ -48,6 +48,7 @@ function submitLoginForm(formSubmitEvent) {
             success: handleLoginResult
         }
     );
+    console.log("After login Ajax");
 }
 // Bind the submit action of the form to a handler function
 login_form.submit(submitLoginForm);
