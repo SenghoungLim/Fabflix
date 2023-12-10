@@ -1,3 +1,3 @@
 public class RecaptchaConstants {
-    public static final String SECRET_KEY ="6Lci5vUoAAAAAClE718avvu6nOOHL_xB3xfX7WjF";
+    public static final String SECRET_KEY ="6LeG6PUoAAAAAG8CfhlP8C0v5ti9kCFomgdVqblV";
 }

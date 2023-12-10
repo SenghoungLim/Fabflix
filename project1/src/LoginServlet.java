@@ -61,10 +61,7 @@ public class LoginServlet extends HttpServlet {
                 return;
             }
         }
-        try{
-            // Create a new connection to database
-            Connection dbCon = dataSource.getConnection();
-
+        try(out; Connection dbCon = dataSource.getConnection();){
             // Declare a new statement
             Statement statement = dbCon.createStatement();
 
