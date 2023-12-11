@@ -6,7 +6,7 @@ import java.util.List;
 
 public class log_processing {
     public static void main(String[] args) {
-        String filePath = "/Users/thientoanvu/Downloads/apache-tomcat-10.1.13/webapps/project1_war/log.txt"; //replace log with the name of the file
+        String filePath = "/var/lib/tomcat10/webapps/project1/log.txt"; //replace log with the name of the file
 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
