@@ -41,8 +41,8 @@ public class LoginFilter implements Filter {
          Always allow your own login related requests(html, js, servlet, etc..)
          You might also want to allow some CSS files, etc..
          */
-        return true;
-        //return lalowedURIs.stream().anyMatch(requestURI.toLowerCase()::endsWith) || requestURI.contains("images");
+        //return true;
+        return allowedURIs.stream().anyMatch(requestURI.toLowerCase()::endsWith) || requestURI.contains("images");
     }
 
     public void init(FilterConfig fConfig) {
