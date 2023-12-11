@@ -3,7 +3,7 @@
   
   - #### Names: Thien Toan Vu & Senghoung Lim
   
-  - #### Project 5 Video Demo Link: [Demo Video Link](https://youtu.be/79ctHj10tjg)
+  - #### Project 5 Video Demo Link: [Demo Video Link](https://youtu.be/7ldtUGrAXy8)
 
   - #### Instruction of deployment: No Special instruction, instructions are followed by the requirement
 
