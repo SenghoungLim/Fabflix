@@ -44,13 +44,13 @@
 | Case 1: HTTP/1 thread                          | ![](path to image in img/)   | 464                        | 396.407                             | 394.116                   | ran for 2m   |
 | Case 2: HTTP/10 threads                        | ![](path to image in img/)   | 3661                       | 3786.64                             | 3785.71                   | ran for 2m   |
 | Case 3: HTTPS/10 threads                       | ![](path to image in img/)   | 4141                       | 4169.31                             | 4168.50                   | ran for 5m   |
-| Case 4: HTTP/10 threads/No connection pooling  | ![](path to image in img/)   | ??                         | ??                                  | ??                        | ran for 2m   |
+| Case 4: HTTP/10 threads/No connection pooling  | ![](path to image in img/)   | 3791                       | 3902.53                             | 3173.37                   | ran for 2m   |
 
 | **Scaled Version Test Plan**                   | **Graph Results Screenshot** | **Average Query Time(ms)** | **Average Search Servlet Time(ms)** | **Average JDBC Time(ms)** | **Analysis** |
 |------------------------------------------------|------------------------------|----------------------------|-------------------------------------|---------------------------|--------------|
 | Case 1: HTTP/1 thread                          | ![](path to image in img/)   | 212                        | 185.250                             | 183.518                   | ran for 2m   |
 | Case 2: HTTP/10 threads                        | ![](path to image in img/)   | 888                        | 847.009                             | 846.794                   | ran for 5m   |
-| Case 3: HTTP/10 threads/No connection pooling  | ![](path to image in img/)   | ??                         | ??                                  | ??                        | ran for 2m   |
+| Case 3: HTTP/10 threads/No connection pooling  | ![](path to image in img/)   | 889                        | 861.485                             | 824.863                   | ran for 2m   |
 
 
 
