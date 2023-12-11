@@ -1,38 +1,35 @@
-# CS122B Project 4
-- [Demo Video Link](https://youtu.be/79ctHj10tjg)
-## Member Distribution
-  - Senghoung Lim
-    - Task 2 and Demo
-  - Thien Toan Vu
-    - Task 1
-## Special Instruction
-- NA
-
 # General
-  - #### Team#:
+  - #### Team#: Jake
   
-  - #### Names:
+  - #### Names: Thien Toan Vu & Senghoung Lim
   
-  - #### Project 5 Video Demo Link:
+  - #### Project 5 Video Demo Link: [Demo Video Link](https://youtu.be/79ctHj10tjg)
 
-  - #### Instruction of deployment:
+  - #### Instruction of deployment: No Special instruction, instructions are followed by the requirement
 
-  - #### Collaborations and Work Distribution:
+  - #### Collaborations and Work Distribution: Senghoung Lim (Task 1 - 3) & Thien Toan Vu (Task 3-4)
 
 
 # Connection Pooling
   - #### Include the filename/path of all code/configuration files in GitHub of using JDBC Connection Pooling.
-  
+  Context.xml\
+  SearchServlet (Data source connection and statement for the project)\
+  pom.xml\
+  Every endpoint access the database
   - #### Explain how Connection Pooling is utilized in the Fabflix code.
-  
+  The connection pooling is unitilizaed in the search field fabflix to help manage and reuse database connections, this will help performance because doing a connection each time to the backend it can be 
+  costly, but with connection pooling it can be reused and pay once. In addition, there is a limit to the connections that we created, this gives a more predictable amount of load and prevent unexpected 
+  failure which can be found in context.xml with this statement "maxTotal="100" maxIdle="30" maxWaitMillis="10000"". 
   - #### Explain how Connection Pooling works with two backend SQL.
+  It works the same either with two or more backend, its job is to efficiently manage and reuse database connections to improve the performance and scalability of applications.
     
 
 # Master/Slave
   - #### Include the filename/path of all code/configuration files in GitHub of routing queries to Master/Slave SQL.
-
+    All the configuration related to routing are in AWS instances.
   - #### How read/write requests were routed to Master/Slave SQL?
-    
+    Onec the the load balancer in instance 1 receive the requests, it will distribute the read/write requests to tomcat instances in this case Master/Slave, this will help improve the incoming traffc prevent 
+    crashes to the system. 
 
 # JMeter TS/TJ Time Logs
   - #### Instructions of how to use the `log_processing.*` script to process the JMeter logs.
