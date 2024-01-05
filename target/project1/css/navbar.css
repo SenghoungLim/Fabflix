@@ -1,0 +1,70 @@
+/* Style for the forms */
+#fulltextForm {
+    display: flex;
+    align-items: center; /* Center vertically */
+    margin-left: auto; /* Move the form all the way to the right */
+}
+
+/* Style for the input fields */
+#fulltextForm input[type="text"] {
+    width: 300px;
+    height: 30px; /* Corrected property name */
+    padding-right: 10px; /* Corrected property name */
+    margin: 4px 0;
+    box-sizing: border-box;
+}
+
+.autocomplete-suggestions {
+    border: 1px solid #999;
+    background: #FFF;
+    overflow: auto;
+}
+
+.autocomplete-suggestion {
+    padding: 2px 5px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.autocomplete-selected {
+    background: #F0F0F0;
+}
+
+.autocomplete-suggestions strong {
+    font-weight: normal;
+    color: #3399FF;
+}
+
+.autocomplete-group {
+    padding: 2px 5px;
+}
+
+.autocomplete-group strong {
+    display: block;
+    border-bottom: 1px solid #000;
+}
+
+.autocomplete-searchbox {
+    height: 50px;
+    width: 600px;
+}
+
+.navbar {
+    background-color: #333; /* Background color for the navbar */
+}
+
+.navbar-dark .navbar-toggler-icon {
+    background-color: #fff; /* Color of the mobile menu icon bars */
+}
+
+.navbar-dark .navbar-toggler:focus {
+    box-shadow: none; /* Remove focus border for the mobile menu button */
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: #fff; /* Color of the navbar links */
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: #e5e5e5; /* Color of the navbar links on hover */
+}
