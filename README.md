@@ -3,5 +3,5 @@
 - Backend: It is a fully built architecture from scratch using AWS instance, MySQL, Tomcat and imported a large database of movie information for movies population.
 - Frontend: A user-friendly frontend using JavaScript, jQuery, and Ajax while developing the same functionality in an Android app using the same backend API.
 
--> (Project Demo)[https://www.youtube.com/watch?v=79ctHj10tjg&t=61s]
+-> [Project Demo](https://www.youtube.com/watch?v=79ctHj10tjg&t=61s)
 
